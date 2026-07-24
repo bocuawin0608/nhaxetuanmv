@@ -5,11 +5,13 @@ import com.ralsei.dto.response.PagedResponse;
 import com.ralsei.dto.response.CoachAndRouteStop.CoachStopResponse;
 import com.ralsei.service.CoachStopService;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Coaches", description = "Coach stop management")
 @RestController
 @RequestMapping("/api/v1/coach-stops")
 @RequiredArgsConstructor

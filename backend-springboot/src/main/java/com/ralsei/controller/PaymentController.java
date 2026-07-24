@@ -19,8 +19,11 @@ import com.ralsei.model.Payment;
 import com.ralsei.service.PaymentService;
 
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Payment", description = "Payment checkout and SePay IPN")
 @RestController
 @RequestMapping("/api/payment")
 @RequiredArgsConstructor
@@ -34,6 +37,8 @@ public class PaymentController {
     @Value("${sepay.api.token}")
     private String sepayApiToken;
 
+    @Hidden
+    @Deprecated
     @PostMapping("/checkout")
     /**
      * Executes the initialize payment operation.
@@ -78,6 +83,8 @@ public class PaymentController {
         }
     }
 
+    @Hidden
+    @Deprecated
     @GetMapping("/transaction/{transactionId}")
     /**
      * Returns the payment by transaction id.

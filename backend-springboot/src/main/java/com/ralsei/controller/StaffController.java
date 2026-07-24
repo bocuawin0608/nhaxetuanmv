@@ -27,8 +27,11 @@ import com.ralsei.service.StaffService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Admin", description = "Admin staff management")
 @RestController
 @RequestMapping("/api/v1/admin/staff")
 @RequiredArgsConstructor
@@ -90,6 +93,8 @@ public class StaffController {
         return ResponseEntity.ok().build();
     }
 
+    @Hidden
+    @Deprecated
     @DeleteMapping("/{staffId:\\d+}")
     public ResponseEntity<Void> deleteStaff(
         @PathVariable @Min(value = 1, message = "ID nhân viên phải lớn hơn 0.") Integer staffId

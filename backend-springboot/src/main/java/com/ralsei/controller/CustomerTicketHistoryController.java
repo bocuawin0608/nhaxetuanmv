@@ -24,11 +24,13 @@ import com.ralsei.service.JwtService;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 /**
  * Exposes booking history and boarding QR images only to authenticated customers.
  */
+@Tag(name = "Customer", description = "Customer ticket history and QR")
 @RestController
 @RequestMapping("/api/v1/customer/history")
 @PreAuthorize("hasRole('CUSTOMER')")

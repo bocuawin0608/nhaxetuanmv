@@ -21,8 +21,11 @@ import com.ralsei.service.CargoTypePriceService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Cargo", description = "Cargo type pricing")
 @RestController
 @RequestMapping("/api/v1/manager/cargo-type-prices")
 @RequiredArgsConstructor
@@ -43,6 +46,8 @@ public class CargoTypePriceController {
         return ResponseEntity.ok(cargoTypePriceService.getAllCargoTypePrices(cargoTypeId, search, page, size));
     }
 
+    @Hidden
+    @Deprecated
     @GetMapping("/{id}")
     public ResponseEntity<CargoTypePriceResponse> getCargoTypePriceById(
             @PathVariable @Min(value = 1, message = "ID của bảng giá phải lớn hơn 0.") int id) {
@@ -64,6 +69,8 @@ public class CargoTypePriceController {
         return ResponseEntity.ok(response);
     }
 
+    @Hidden
+    @Deprecated
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCargoTypePrice(
             @PathVariable @Min(value = 1, message = "ID của bảng giá phải lớn hơn 0.") int id) {

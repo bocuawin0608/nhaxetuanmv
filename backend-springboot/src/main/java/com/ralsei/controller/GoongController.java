@@ -7,10 +7,13 @@ import com.ralsei.dto.response.goong.CalculateRouteDistancesResponse;
 import com.ralsei.dto.response.goong.GeocodeResponse;
 import com.ralsei.service.GoongService;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Goong", description = "Goong map proxy")
 @RestController
 @RequestMapping("/api/v2/goong")
 @RequiredArgsConstructor
@@ -33,6 +36,8 @@ public class GoongController {
         return ResponseEntity.ok(goongService.autocomplete(input));
     }
 
+    @Hidden
+    @Deprecated
     @GetMapping("/geocode")
     /**
      * Executes the geocode operation.
@@ -45,6 +50,8 @@ public class GoongController {
         return ResponseEntity.ok(goongService.geocode(address));
     }
 
+    @Hidden
+    @Deprecated
     @GetMapping("/place/distance-time")
     /**
      * Returns the distance and time.

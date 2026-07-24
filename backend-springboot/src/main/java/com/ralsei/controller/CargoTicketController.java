@@ -43,8 +43,11 @@ import com.ralsei.service.JwtService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Cargo", description = "Cargo ticket lifecycle")
 @RestController
 @RequestMapping("/api/v1/ticket-staff/cargo-tickets")
 @RequiredArgsConstructor
@@ -133,6 +136,8 @@ public class CargoTicketController {
         return ResponseEntity.ok(cargoTicketService.getCargoTicketDetailsByTicketId(id));
     }
 
+    @Hidden
+    @Deprecated
     @PostMapping
     public ResponseEntity<CargoTicketResponse> createCargoTicket(
             @RequestHeader("Authorization") String authorizationHeader,
@@ -149,6 +154,8 @@ public class CargoTicketController {
                 request, jwtService.extractAccountId(authorizationHeader)));
     }
 
+    @Hidden
+    @Deprecated
     @PutMapping("/{id:\\d+}")
     public ResponseEntity<CargoTicketResponse> updateCargoTicket(
             @PathVariable @Min(1) int id,

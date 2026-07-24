@@ -16,11 +16,13 @@ import com.ralsei.dto.response.staff.StaffProfileResponse;
 import com.ralsei.service.StaffAccountService;
 
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 /**
  * Internal staff account self-service endpoints.
  */
+@Tag(name = "Staff Profile", description = "Staff account self-service")
 @RestController
 @RequestMapping("/api/v1/staff/me")
 @PreAuthorize("hasAnyRole('ADMIN','MANAGER','TICKET_STAFF','TRIP_STAFF')")

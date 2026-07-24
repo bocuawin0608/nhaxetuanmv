@@ -35,8 +35,10 @@ import com.ralsei.util.validation.BookingValidationPatterns;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Booking", description = "Customer passenger booking and seat lock")
 @RestController
 @RequestMapping("/api/v1/bookings")
 @PreAuthorize("isAnonymous() or hasRole('CUSTOMER')")

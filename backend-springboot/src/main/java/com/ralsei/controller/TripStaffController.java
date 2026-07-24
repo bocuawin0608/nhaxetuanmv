@@ -30,8 +30,11 @@ import com.ralsei.service.tripstaff.TripStaffPassengerService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Trips", description = "Trip staff operations")
 @RestController
 @RequestMapping("/api/v1/staff/trips")
 @PreAuthorize("hasRole('TRIP_STAFF')")
@@ -124,6 +127,8 @@ public class TripStaffController {
         return ResponseEntity.ok().build();
     }
 
+    @Hidden
+    @Deprecated
     @PostMapping("/{tripId}/passengers/{ticketDetailId}/no-show")
     public ResponseEntity<Void> markNoShow(
             @RequestHeader("Authorization") String authorizationHeader,

@@ -26,8 +26,11 @@ import com.ralsei.service.RoleService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Admin", description = "Admin role management")
 @RestController
 @RequestMapping("/api/v1/admin/roles")
 @RequiredArgsConstructor
@@ -81,6 +84,8 @@ public class RoleController {
         return ResponseEntity.ok().build();
     }
 
+    @Hidden
+    @Deprecated
     @PatchMapping("/{roleId:\\d+}/toggle-active")
     public ResponseEntity<Void> toggleActive(
         @PathVariable @Min(value = 1, message = "ID vai trò phải lớn hơn 0.") Integer roleId
@@ -89,6 +94,8 @@ public class RoleController {
         return ResponseEntity.ok().build();
     }
 
+    @Hidden
+    @Deprecated
     @DeleteMapping("/{roleId:\\d+}")
     public ResponseEntity<Void> deleteRole(
         @PathVariable @Min(value = 1, message = "ID vai trò phải lớn hơn 0.") Integer roleId

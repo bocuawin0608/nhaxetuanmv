@@ -31,8 +31,11 @@ import com.ralsei.service.AccountService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Admin", description = "Admin account management")
 @RestController
 @RequestMapping("/api/v1/admin/accounts")
 @RequiredArgsConstructor
@@ -157,6 +160,8 @@ public class AccountController {
      * @param accountId ID của tài khoản
      * @return ResponseEntity<Void>
      */
+    @Hidden
+    @Deprecated
     @DeleteMapping("/{accountId:\\d+}")
     public ResponseEntity<Void> deleteAccount(
         @PathVariable @Min(value = 1, message = "ID tài khoản phải lớn hơn 0.") Integer accountId

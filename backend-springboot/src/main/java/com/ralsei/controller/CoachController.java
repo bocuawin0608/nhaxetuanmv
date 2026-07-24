@@ -33,8 +33,10 @@ import com.ralsei.service.CoachService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Coaches", description = "Coach fleet management")
 @RestController
 @RequestMapping("/api/v1/coaches")
 @RequiredArgsConstructor

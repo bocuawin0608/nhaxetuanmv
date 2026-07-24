@@ -33,12 +33,14 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 /**
  * HTTP entry point for public customer trip discovery and authenticated staff
  * trip operations. Each endpoint delegates business rules to {@link TripService}
  * and keeps request binding concerns at the web boundary.
  */
+@Tag(name = "Trips", description = "Trip search and manager trip CRUD")
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor

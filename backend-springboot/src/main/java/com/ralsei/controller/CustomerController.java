@@ -26,8 +26,11 @@ import com.ralsei.service.CustomerService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Admin", description = "Admin customer management")
 @RestController
 @RequestMapping("/api/v1/admin/customers")
 @RequiredArgsConstructor
@@ -81,6 +84,8 @@ public class CustomerController {
         return ResponseEntity.ok().build();
     }
 
+    @Hidden
+    @Deprecated
     @PatchMapping("/{customerId:\\d+}/toggle-active")
     public ResponseEntity<Void> toggleActive(
         @PathVariable @Min(value = 1, message = "ID khách hàng phải lớn hơn 0.") Integer customerId
@@ -89,6 +94,8 @@ public class CustomerController {
         return ResponseEntity.ok().build();
     }
 
+    @Hidden
+    @Deprecated
     @DeleteMapping("/{customerId:\\d+}")
     public ResponseEntity<Void> deleteCustomer(
         @PathVariable @Min(value = 1, message = "ID khách hàng phải lớn hơn 0.") Integer customerId

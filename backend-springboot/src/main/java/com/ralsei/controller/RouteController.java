@@ -24,8 +24,11 @@ import com.ralsei.service.RouteService;
 import com.ralsei.dto.projection.route.RouteLocationDropdownProjection;
 
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Routes", description = "Route management")
 @RestController
 @RequestMapping("/api/v1/routes")
 @RequiredArgsConstructor
@@ -36,6 +39,8 @@ public class RouteController {
 
     private final RouteService routeService;
 
+    @Hidden
+    @Deprecated
     @PostMapping
     /**
      * Creates the route.

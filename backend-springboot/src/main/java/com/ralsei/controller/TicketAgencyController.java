@@ -29,8 +29,11 @@ import com.ralsei.service.TicketAgencyService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Admin", description = "Admin ticket agency management")
 @RestController
 @RequestMapping("/api/v1/admin/ticket-agencies")
 @RequiredArgsConstructor
@@ -92,6 +95,8 @@ public class TicketAgencyController {
         return ResponseEntity.ok().build();
     }
 
+    @Hidden
+    @Deprecated
     @DeleteMapping("/{ticketAgencyId:\\d+}")
     public ResponseEntity<Void> deleteTicketAgency(
         @PathVariable @Min(value = 1, message = "ID bến xe phải lớn hơn 0.") Integer ticketAgencyId
@@ -100,6 +105,8 @@ public class TicketAgencyController {
         return ResponseEntity.noContent().build();
     }
 
+    @Hidden
+    @Deprecated
     @GetMapping("/coach-stop-dropdown")
     public ResponseEntity<List<CoachStopDropdownDTO>> getCoachStopDropdown() {
         return ResponseEntity.ok(ticketAgencyService.getCoachStopDropdown());

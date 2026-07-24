@@ -40,8 +40,11 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Passenger Tickets", description = "Staff passenger ticket operations")
 @RestController
 @RequestMapping("/api/v1/staff/passenger-tickets")
 @PreAuthorize("hasRole('TICKET_STAFF')")
@@ -80,6 +83,8 @@ public class StaffPassengerTicketController {
         return ResponseEntity.ok(queryService.getDetail(ticketCode));
     }
 
+    @Hidden
+    @Deprecated
     @PatchMapping("/{ticketCode:[A-Za-z0-9_-]+}/details/{detailId}/passenger-info")
     public ResponseEntity<StaffPassengerTicketDetailResponse> changePassengerInfo(
         @RequestHeader("Authorization") String authorizationHeader,
@@ -139,6 +144,8 @@ public class StaffPassengerTicketController {
         return ResponseEntity.noContent().build();
     }
 
+    @Hidden
+    @Deprecated
     @PatchMapping("/{ticketCode:[A-Za-z0-9_-]+}/details/{detailId}/seat")
     public ResponseEntity<StaffPassengerTicketDetailResponse> changeSeat(
         @RequestHeader("Authorization") String authorizationHeader,
@@ -181,6 +188,8 @@ public class StaffPassengerTicketController {
         ));
     }
 
+    @Hidden
+    @Deprecated
     @PatchMapping("/{ticketCode:[A-Za-z0-9_-]+}/itinerary")
     public ResponseEntity<StaffPassengerTicketDetailResponse> changeItinerary(
         @RequestHeader("Authorization") String authorizationHeader,

@@ -33,8 +33,11 @@ import com.ralsei.service.CoachTypeService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Coaches", description = "Coach type management")
 @RestController
 @RequestMapping("/api/v1/coach-types")
 @RequiredArgsConstructor
@@ -90,6 +93,8 @@ public class CoachTypeController {
         return ResponseEntity.noContent().build();
     }
 
+    @Hidden
+    @Deprecated
     @PutMapping("/{id}/price")
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<Void> configurePrice(

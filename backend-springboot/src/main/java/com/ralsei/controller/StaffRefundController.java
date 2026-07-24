@@ -25,11 +25,13 @@ import com.ralsei.service.staffrefund.StaffRefundService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 /**
  * Manager APIs for reviewing and completing passenger refund requests.
  */
+@Tag(name = "Passenger Tickets", description = "Passenger refund review")
 @RestController
 @RequestMapping("/api/v1/refunds")
 @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")

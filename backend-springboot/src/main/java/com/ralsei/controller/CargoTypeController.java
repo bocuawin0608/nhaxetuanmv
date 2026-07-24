@@ -21,8 +21,10 @@ import com.ralsei.service.CargoTypeService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Cargo", description = "Cargo type catalog")
 @RestController
 @RequestMapping("/api/v1/manager/cargo-types")
 @RequiredArgsConstructor

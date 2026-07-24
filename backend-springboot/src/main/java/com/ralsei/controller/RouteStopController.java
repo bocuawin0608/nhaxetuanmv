@@ -7,11 +7,14 @@ import com.ralsei.dto.request.route.RouteStopOrderUpdateRequest;
 import com.ralsei.service.RouteStopService;
 import java.util.List;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Routes", description = "Route stop management")
 @RestController
 @RequestMapping("/api/v1/route-stops")
 @RequiredArgsConstructor
@@ -35,6 +38,8 @@ public class RouteStopController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Hidden
+    @Deprecated
     @PutMapping("/{id}")
     public ResponseEntity<RouteStopResponse> updateRouteStop(
             @PathVariable int id,
@@ -50,6 +55,8 @@ public class RouteStopController {
         return ResponseEntity.ok(responses);
     }
 
+    @Hidden
+    @Deprecated
     @GetMapping("/{id}")
     /**
      * Returns the route stop by id.
@@ -63,6 +70,8 @@ public class RouteStopController {
         return ResponseEntity.ok(response);
     }
 
+    @Hidden
+    @Deprecated
     @GetMapping
     public ResponseEntity<PagedResponse<RouteStopResponse>> getAllRouteStops(
             @RequestParam(required = false, defaultValue = "0") int routeId,

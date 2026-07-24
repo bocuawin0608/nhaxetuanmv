@@ -8,6 +8,8 @@ import com.ralsei.dto.response.voucher.VoucherMetricsResponse;
 import com.ralsei.dto.response.voucher.VoucherResponse;
 import com.ralsei.service.VoucherService;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "Vouchers", description = "Voucher management")
 @RestController
 @RequestMapping("/api/v1/vouchers")
 @RequiredArgsConstructor
@@ -90,6 +93,8 @@ public class VoucherController {
         return ResponseEntity.noContent().build();
     }
 
+    @Hidden
+    @Deprecated
     @GetMapping("/metrics")
     public ResponseEntity<VoucherMetricsResponse> getVoucherMetrics() {
         return ResponseEntity.ok(voucherService.getVoucherMetrics());

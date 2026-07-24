@@ -15,11 +15,14 @@ import com.ralsei.dto.response.customer.CustomerProfileResponse;
 import com.ralsei.service.CustomerAccountService;
 
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 /**
  * Customer website account self-service endpoints.
  */
+@Tag(name = "Customer", description = "Customer account self-service")
 @RestController
 @RequestMapping("/api/v1/customer/me")
 @PreAuthorize("hasRole('CUSTOMER')")
@@ -52,6 +55,8 @@ public class CustomerAccountController {
     /**
      * Soft-deactivates the signed-in customer account.
      */
+    @Hidden
+    @Deprecated
     @DeleteMapping
     /**
      * Executes the deactivate current account operation.

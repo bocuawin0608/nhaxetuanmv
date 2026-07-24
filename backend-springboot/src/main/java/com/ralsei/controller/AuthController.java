@@ -17,8 +17,10 @@ import com.ralsei.dto.response.auth.StaffForgotPasswordResponse;
 import com.ralsei.service.AuthService;
 
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Auth", description = "Authentication and token endpoints")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

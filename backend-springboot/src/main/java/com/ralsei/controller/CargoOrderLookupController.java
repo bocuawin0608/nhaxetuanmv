@@ -14,9 +14,11 @@ import com.ralsei.dto.response.customer.CargoOrderLookupResponse;
 import com.ralsei.service.CargoOrderLookupService;
 import com.ralsei.service.JwtService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 /** Authenticated read-only endpoint for customer-owned cargo order history. */
+@Tag(name = "Cargo", description = "Customer cargo order history")
 @RestController
 @RequestMapping("/api/v1/customer/cargo-history")
 @PreAuthorize("hasRole('CUSTOMER')")
