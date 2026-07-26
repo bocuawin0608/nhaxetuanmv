@@ -47,8 +47,6 @@ public class StaffRefundServiceImpl implements StaffRefundService {
 
     private static final Pattern BANK_TRANSFER_TRANSACTION_PATTERN =
         Pattern.compile("^[A-Za-z0-9-]{4,100}$");
-    private static final Pattern SEPAY_TRANSACTION_PATTERN =
-        Pattern.compile("^[A-Za-z0-9_-]{4,100}$");
     private static final Pattern TICKET_CODE_PATTERN =
         Pattern.compile("[A-Za-z0-9_-]{3,64}");
     private static final Pattern PHONE_SEARCH_PATTERN =
@@ -258,16 +256,6 @@ public class StaffRefundServiceImpl implements StaffRefundService {
             }
             if (!BANK_TRANSFER_TRANSACTION_PATTERN.matcher(trimmed).matches()) {
                 throw new BusinessRuleException("Mã giao dịch chuyển khoản không hợp lệ.");
-            }
-            return trimmed;
-        }
-
-        if (refundMethod == RefundMethod.SEPAY) {
-            if (trimmed == null) {
-                throw new BusinessRuleException("Vui lòng nhập mã giao dịch SePay hoàn tiền.");
-            }
-            if (!SEPAY_TRANSACTION_PATTERN.matcher(trimmed).matches()) {
-                throw new BusinessRuleException("Mã giao dịch SePay không hợp lệ.");
             }
             return trimmed;
         }

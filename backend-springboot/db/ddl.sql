@@ -534,7 +534,7 @@ CREATE TABLE [payment] (
         ([passengerTicketId] IS NULL AND [cargoTicketId] IS NOT NULL)
     ),
 	CONSTRAINT CK_Payment_Amount CHECK ([amount] > 0 AND [refundAmount] >= 0),
-    CONSTRAINT CK_Payment_Method CHECK ([paymentMethod] IN ('SEPAY', 'CASH', 'BANK_TRANSFER')),
+    CONSTRAINT CK_Payment_Method CHECK ([paymentMethod] IN ('CASH', 'BANK_TRANSFER')),
     CONSTRAINT CK_Payment_Status CHECK ([status] IN ('PENDING', 'COMPLETED', 'FAILED')),
 );
 
@@ -575,7 +575,7 @@ CREATE TABLE [refund] (
     FOREIGN KEY ([paymentId]) REFERENCES [payment] ([paymentId]),
 
 	CONSTRAINT CK_Refund_Amount CHECK ([amount] > 0),
-    CONSTRAINT CK_Refund_Method CHECK ([refundMethod] IN ('SEPAY', 'BANK_TRANSFER', 'CASH')),
+    CONSTRAINT CK_Refund_Method CHECK ([refundMethod] IN ('BANK_TRANSFER', 'CASH')),
     CONSTRAINT CK_Refund_Status CHECK ([status] IN ('PENDING', 'COMPLETED', 'FAILED'))
 );
 

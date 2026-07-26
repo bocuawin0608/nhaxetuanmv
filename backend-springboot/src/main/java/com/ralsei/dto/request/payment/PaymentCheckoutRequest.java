@@ -28,7 +28,7 @@ public class PaymentCheckoutRequest {
     private BigDecimal amount;
 
     @NotBlank(message = "Payment method is required")
-    @Pattern(regexp = "SEPAY|CASH|BANK_TRANSFER", message = "Payment method must be SEPAY, CASH, or BANK_TRANSFER")
+    @Pattern(regexp = "CASH|BANK_TRANSFER", message = "Payment method must be CASH or BANK_TRANSFER")
     private String paymentMethod;
 
     @AssertTrue(message = "Payment must target exactly one ticket type")
