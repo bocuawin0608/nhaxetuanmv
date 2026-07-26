@@ -13,9 +13,7 @@ public enum RefundMethod {
     /** Manual bank transfer to the customer account stored in callback data. */
     BANK_TRANSFER,
     /** Cash payout at the ticket counter. */
-    CASH,
-    /** Refund routed through the SePay gateway. */
-    SEPAY;
+    CASH;
 
     /**
      * Parses a trimmed refund method from API input or persisted rows.

@@ -830,7 +830,7 @@ BEGIN
 
         INSERT INTO [payment] (passengerTicketId, cargoTicketId, amount, paymentMethod, transactionId, [status], paymentTime)
         VALUES (
-            @NewPId, NULL, @CalculatedTicketPrice, 'SEPAY',
+            @NewPId, NULL, @CalculatedTicketPrice, 'BANK_TRANSFER',
             'TXN_P_' + CAST(@TicketIdx AS VARCHAR(5)),
             CASE WHEN @TicketStatus = 'CONFIRMED' THEN 'COMPLETED' ELSE 'PENDING' END,
             CASE WHEN @TicketStatus = 'CONFIRMED' THEN GETDATE() ELSE NULL END
@@ -956,7 +956,7 @@ BEGIN
         @CancelPaymentId,
         (SELECT amount * 0.70 FROM [payment] WHERE paymentId = @CancelPaymentId),
         N'Khách hủy vé trước giờ khởi hành (seed)',
-        'SEPAY',
+        'BANK_TRANSFER',
         'RFND_' + CAST(@CancelTicketId AS VARCHAR(20)),
         'COMPLETED',
         GETDATE()

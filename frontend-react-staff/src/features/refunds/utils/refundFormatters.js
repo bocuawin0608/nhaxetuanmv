@@ -7,13 +7,11 @@ const REFUND_STATUS_LABELS = {
 const REFUND_METHOD_LABELS = {
     BANK_TRANSFER: 'Chuyển khoản',
     CASH: 'Tiền mặt',
-    SEPAY: 'SePay',
 };
 
 const ALLOWED_REFUND_STATUSES = ['PENDING', 'COMPLETED', 'FAILED', ''];
 
 const BANK_TRANSFER_TRANSACTION_PATTERN = /^[A-Za-z0-9-]{4,100}$/;
-const SEPAY_TRANSACTION_PATTERN = /^[A-Za-z0-9_-]{4,100}$/;
 
 export const DEFAULT_REFUND_STATUS = 'PENDING';
 export const DEFAULT_TAB = 'passenger';
@@ -197,16 +195,6 @@ export function getTransactionIdConfig(refundMethod) {
             required: true,
             pattern: BANK_TRANSFER_TRANSACTION_PATTERN,
             invalidMessage: 'Mã giao dịch phải gồm 4-100 ký tự chữ, số hoặc dấu gạch ngang.',
-        };
-    }
-
-    if (refundMethod === 'SEPAY') {
-        return {
-            label: 'Mã giao dịch SePay hoàn tiền',
-            placeholder: 'Nhập mã giao dịch SePay',
-            required: true,
-            pattern: SEPAY_TRANSACTION_PATTERN,
-            invalidMessage: 'Mã giao dịch SePay không hợp lệ.',
         };
     }
 
