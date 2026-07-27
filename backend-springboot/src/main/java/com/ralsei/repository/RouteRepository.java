@@ -47,14 +47,17 @@ public interface RouteRepository extends JpaRepository<Route, Integer> {
    */
   @Query("""
       SELECT DISTINCT r.routeId AS routeId,
+                      cs.stopPointId AS stopPointId,
                       r.routeName AS routeName,
-                      cs.city AS locationName
+                      cs.city AS locationName,
+                      cs.stopPointName AS stopPointName,
+                      cs.address AS address
       FROM Route r
       JOIN r.routeStops rs
       JOIN rs.coachStop cs
       WHERE r.isActive = true
         AND cs.isActive = true
-      ORDER BY r.routeName, cs.city
+      ORDER BY cs.city, cs.stopPointId, r.routeName
       """)
   List<RouteLocationDropdownProjection> findRouteLocationsForCustomerDropdown();
 
