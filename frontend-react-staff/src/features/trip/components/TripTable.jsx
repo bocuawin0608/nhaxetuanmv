@@ -50,7 +50,7 @@ export default function TripTable({ data, loading, onViewCrew, onEditInfo, onDel
                 const seats = getSeatLoad(trip.availableSeats, trip.totalSeats);
                 const cargo = getLoad(trip.usedCargoVolume, trip.cargoCapacity);
                 const missingCrew = !trip.driverName || !trip.attendantName;
-                const canCancel = !['DEPARTED', 'IN_PROGRESS', 'INPROGRESS', 'ARRIVED', 'COMPLETED', 'CANCELLED', 'CANCELED'].includes(status);
+                const canManage = status === 'SCHEDULED';
 
                 return (
                     <article key={trip.tripId} className={`trip-card trip-card--${statusTone}`}>
@@ -88,8 +88,15 @@ export default function TripTable({ data, loading, onViewCrew, onEditInfo, onDel
                         </button>
 
                         <div className="trip-card-actions" aria-label={`Thao tác chuyến ${trip.tripId}`}>
-                            <button type="button" onClick={() => onEditInfo(trip)}><BsPencil /> {hasIncident ? 'Điều xe thay thế' : 'Chỉnh sửa'}</button>
-                            {canCancel && <button type="button" className="is-danger" onClick={() => onDelete(trip)}><BsTrash /> Hủy chuyến</button>}
+                            <button
+                                type="button"
+                                onClick={() => onEditInfo(trip)}
+                                disabled={!canManage}
+                                title={canManage ? undefined : 'Chuyến đã bắt đầu hoặc kết thúc, chỉ có thể xem'}
+                            >
+                                <BsPencil /> {hasIncident ? 'Điều xe thay thế' : 'Chỉnh sửa'}
+                            </button>
+                            {canManage && <button type="button" className="is-danger" onClick={() => onDelete(trip)}><BsTrash /> Hủy chuyến</button>}
                         </div>
                     </article>
                 );

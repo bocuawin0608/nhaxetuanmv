@@ -371,7 +371,7 @@ public interface TripRepository extends JpaRepository<Trip, Integer> {
             @Param("attendantId") Integer attendantId);
 
     /**
-     * Atomically updates an open trip using only statuses accepted by
+     * Atomically updates a scheduled trip using only statuses accepted by
      * CK_Trip_Status.
      *
      * @return one when updated, otherwise zero
@@ -384,9 +384,9 @@ public interface TripRepository extends JpaRepository<Trip, Integer> {
                 driverId = :driverId, attendantId = :attendantId,
                 updatedAt = GETDATE()
             WHERE tripId = :tripId
-              AND [status] NOT IN ('CANCELLED', 'COMPLETED')
+              AND [status] = 'SCHEDULED'
             """, nativeQuery = true)
-    int updateOpenTrip(
+    int updateScheduledTrip(
             @Param("tripId") Integer tripId,
             @Param("routeId") Integer routeId,
             @Param("coachId") Integer coachId,
@@ -396,7 +396,7 @@ public interface TripRepository extends JpaRepository<Trip, Integer> {
             @Param("attendantId") Integer attendantId);
 
     /**
-     * Soft-deletes an open trip as CANCELLED. Physical deletion is forbidden by
+     * Soft-deletes a scheduled trip as CANCELLED. Physical deletion is forbidden by
      * ticket and seat foreign keys and would destroy operational history.
      *
      * @return one when cancelled, otherwise zero
@@ -406,9 +406,9 @@ public interface TripRepository extends JpaRepository<Trip, Integer> {
             UPDATE trip
             SET [status] = 'CANCELLED', updatedAt = GETDATE()
             WHERE tripId = :tripId
-              AND [status] NOT IN ('CANCELLED', 'COMPLETED')
+              AND [status] = 'SCHEDULED'
             """, nativeQuery = true)
-    int cancelOpenTrip(@Param("tripId") Integer tripId);
+    int cancelScheduledTrip(@Param("tripId") Integer tripId);
 
     /**
      * Searches customer trips with optional time, coach type, and price filters.

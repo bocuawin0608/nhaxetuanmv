@@ -378,9 +378,9 @@ public class TripServiceImpl implements TripService {
     public String updateTrip(Integer tripId, TripUpdateRequest updateRequest) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new NoSuchElementException("Không tìm thấy chuyến xe có ID: " + tripId));
-        if ("COMPLETED".equals(trip.getStatus()) || isCancelled(trip.getStatus())) {
-            LOGGER.error("Validation Failed: Chuyến xe ID {} đã đóng trạng thái, cấm chỉnh sửa.", tripId);
-            return "Chuyến xe đã hoàn thành hoặc bị hủy, không thể chỉnh sửa thông tin!";
+        if (!"SCHEDULED".equals(trip.getStatus())) {
+            LOGGER.warn("Rejected update for non-scheduled trip: tripId={}, status={}", tripId, trip.getStatus());
+            return "Chuyến xe đã bắt đầu hoặc kết thúc, chỉ có thể xem thông tin.";
         }
         LocalDateTime validationTime = currentMinute();
         if (updateRequest.departureTime() == null
@@ -397,7 +397,7 @@ public class TripServiceImpl implements TripService {
                 updateRequest.driverId(), updateRequest.attendantId(), updateRequest.departureTime(), tripId)) {
             return "Xe hoặc nhân sự đã có lịch trùng. Vui lòng chọn lại.";
         }
-        int updated = tripRepository.updateOpenTrip(tripId, updateRequest.routeId(), updateRequest.coachId(),
+        int updated = tripRepository.updateScheduledTrip(tripId, updateRequest.routeId(), updateRequest.coachId(),
                 updateRequest.departureTime(), updateRequest.status(), updateRequest.driverId(),
                 updateRequest.attendantId());
         if (updated != 1) {
@@ -417,13 +417,10 @@ public class TripServiceImpl implements TripService {
     public String deleteTrip(Integer tripId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new NoSuchElementException("Không tìm thấy chuyến xe có ID: " + tripId));
-        if (isCancelled(trip.getStatus())) {
-            return "Chuyến xe này đã bị hủy bỏ từ trước đó rồi.";
+        if (!"SCHEDULED".equals(trip.getStatus())) {
+            return "Chuyến xe đã bắt đầu hoặc kết thúc, chỉ có thể xem thông tin.";
         }
-        if ("COMPLETED".equals(trip.getStatus())) {
-            return "Chuyến xe đã hoàn thành hành trình, không thể xóa bỏ!";
-        }
-        int cancelled = tripRepository.cancelOpenTrip(tripId);
+        int cancelled = tripRepository.cancelScheduledTrip(tripId);
         if (cancelled != 1) {
             return "Chuyến xe đã thay đổi trạng thái, vui lòng tải lại danh sách.";
         }
