@@ -134,6 +134,28 @@ const extractLocationsFromRoutes = (routes) => {
 };
 
 /**
+ * Groups active coach stops by province and removes duplicates caused by the
+ * two route directions returned by the backend.
+ */
+const groupOfficeLocations = (routes) => {
+    const uniqueStops = new Map();
+    routes.forEach((route) => {
+        const stopPointId = Number(route.stopPointId);
+        const address = route.address?.trim();
+        const city = normalizeLocationName(route.locationName || '');
+        if (Number.isInteger(stopPointId) && address && city && !uniqueStops.has(stopPointId)) {
+            uniqueStops.set(stopPointId, { stopPointId, address, city });
+        }
+    });
+
+    return Array.from(uniqueStops.values()).reduce((groups, stop) => {
+        if (!groups[stop.city]) groups[stop.city] = [];
+        groups[stop.city].push(stop);
+        return groups;
+    }, {});
+};
+
+/**
  * Normalizes a backend timestamp before displaying HH:mm to the customer.
  * Untrusted or malformed values return a visible placeholder instead of
  * leaking arbitrary response text into the schedule card.
@@ -334,6 +356,7 @@ const HomePage = () => {
     const [date, setDate] = useState('');
     const [returnDate, setReturnDate] = useState('');
     const [routes, setRoutes] = useState([]);
+    const [locationsStatus, setLocationsStatus] = useState('loading');
     const [searchHistory, setSearchHistory] = useState(readSearchHistory);
     const [trips, setTrips] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -352,8 +375,14 @@ const HomePage = () => {
     useEffect(() => {
         tripService
             .getCustomerRouteLocations()
-            .then(setRoutes)
-            .catch(() => setRoutes([]));
+            .then((locations) => {
+                setRoutes(locations);
+                setLocationsStatus('ready');
+            })
+            .catch(() => {
+                setRoutes([]);
+                setLocationsStatus('error');
+            });
     }, []);
 
     useEffect(() => {
@@ -375,6 +404,7 @@ const HomePage = () => {
     }, [stopModal.trip]);
 
     const locationOptions = useMemo(() => extractLocationsFromRoutes(routes), [routes]);
+    const officeLocations = useMemo(() => groupOfficeLocations(routes), [routes]);
     const departureOptions = locationOptions;
     const destinationOptions = useMemo(
         () => locationOptions.filter((location) => location !== normalizeLocationName(departure)),
@@ -796,27 +826,28 @@ const HomePage = () => {
                     <div className="office-section-container">
                         <h3 className="office-section-title">Liên hệ</h3>
                         <div className="office-grid-layout">
-                            <div className="office-card">
-                                <div className="office-card-header">VP Quảng Trị</div>
-                                <div className="office-card-body">
-                                    <ul className="address-list">
-                                        <li><SvgIcon name="pin" className="location-icon" />19A Lý Thường Kiệt, Đồng Hới, Quảng Trị</li>
-                                        <li><SvgIcon name="pin" className="location-icon" />Đường Nguyễn Văn Linh, Bố Trạch, Hoàn Lão, Quảng Trị</li>
-                                        <li><SvgIcon name="pin" className="location-icon" />Nguyễn Tất Thành, Kiến Giang, Lệ Thủy, Quảng Trị</li>
-                                    </ul>
+                            {locationsStatus === 'loading' && (
+                                <p className="office-status">Đang tải địa chỉ văn phòng...</p>
+                            )}
+                            {locationsStatus === 'error' && (
+                                <p className="office-status office-status-error">Chưa thể tải địa chỉ văn phòng.</p>
+                            )}
+                            {Object.entries(officeLocations).map(([city, stops]) => (
+                                <div className="office-card" key={city}>
+                                    <div className="office-card-header">VP {city}</div>
+                                    <div className="office-card-body">
+                                        <ul className="address-list">
+                                            {stops.map((stop) => (
+                                                <li key={stop.stopPointId}>
+                                                    <SvgIcon name="pin" className="location-icon" />
+                                                    {stop.address}, {stop.city}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div className="office-card-footer">Hotline: <strong className="phone-highlight">0914.077.779</strong></div>
                                 </div>
-                                <div className="office-card-footer">Hotline: <strong className="phone-highlight">0914.077.779</strong></div>
-                            </div>
-                            <div className="office-card">
-                                <div className="office-card-header">VP Hà Nội</div>
-                                <div className="office-card-body">
-                                    <ul className="address-list">
-                                        <li><SvgIcon name="pin" className="location-icon" />338 Trần Khát Chân, Hai Bà Trưng, Hà Nội</li>
-                                        <li><SvgIcon name="pin" className="location-icon" />Sảnh T1 + T2 Sân bay Nội Bài</li>
-                                    </ul>
-                                </div>
-                                <div className="office-card-footer">Hotline: <strong className="phone-highlight">0914.077.779</strong></div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 ) : (

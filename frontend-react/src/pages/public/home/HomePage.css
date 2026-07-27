@@ -577,6 +577,18 @@ background-color: var(--ralsei-pink);
     gap: 24px;
 }
 
+.office-status {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 20px;
+    color: #555555;
+    text-align: center;
+}
+
+.office-status-error {
+    color: #b42318;
+}
+
 .office-card {
     background: #ffffff;
     border: 1px solid #eef0f2;

@@ -77,23 +77,23 @@ INSERT INTO [voucher] (voucherCode, discountValue, startEffectiveDate, endEffect
 ('GIAM50K', 50000.00, '2026-01-01', '2028-12-31', 'FIXED', 50000.00, 0.00, 1000),
 ('TET2026', 15.00, '2026-01-01', '2026-03-01', 'PERCENT', 100000.00, 300000.00, 500);
 
--- Coach stops: Hà Nội + Quảng Trị (former Quảng Bình addresses only). City label = Quảng Trị.
+-- Real customer-facing locations supplied by the operator. City is the current province label.
 -- Address must match: ^[^,]+(,\s+[^,]+)+$
+-- Coordinates are approximate locality centers; verify with an approved geocoding flow before map use.
 INSERT INTO [coach_stop] (stopPointName, address, city, surcharge, isActive, latitude, longitude) VALUES
 -- Hà Nội
-(N'Bến Xe Nước Ngầm',           N'Số 1 Ngọc Hồi, Hoàng Mai',                      N'Hà Nội',     0.00,      1, 20.9399174370000000, 105.8442251250000000),
-(N'Bến Xe Giáp Bát',            N'Số 6 Giải Phóng, Hoàng Mai',                    N'Hà Nội',     0.00,      1, 20.9782000000000000, 105.8411000000000000),
-(N'Bến Xe Mỹ Đình',             N'Số 20 Phạm Hùng, Nam Từ Liêm',                  N'Hà Nội',     0.00,      1, 21.0285000000000000, 105.7782000000000000),
-(N'Sảnh T1+T2 - Sân bay Nội Bài', N'Sảnh E, Nhà ga T1, Sóc Sơn',                  N'Hà Nội',     100000.00,	1, 21.2149337000000000, 105.8007099000000000),
-(N'Văn phòng Cầu Giấy',         N'Số 125 Xuân Thủy, Cầu Giấy',                    N'Hà Nội',     0.00,		1, 21.0368000000000000, 105.7825000000000000),
--- Quảng Trị (physical boundary = former Quảng Bình)
-(N'Trạm Dừng Ba Đồn',           N'Phường Ba Đồn, Thị xã Ba Đồn',                  N'Quảng Trị',  0.00,      1, 17.7546377497501000, 106.4233121072500000),
-(N'Trạm Dừng Quảng Ninh',       N'Thị trấn Hoàn Lão, Huyện Quảng Ninh',           N'Quảng Trị',  0.00,      1, 17.6485000000000000, 106.5082000000000000),
-(N'Văn Phòng Đồng Hới',         N'Số 58 Trần Hưng Đạo, Đồng Hới',                 N'Quảng Trị',  0.00,      1, 17.4691879169492000, 106.6104383894200000),
-(N'Bến Xe Đồng Hới',            N'Số 95 Lý Thường Kiệt, Đồng Hới',                N'Quảng Trị',  0.00,      1, 17.4682000000000000, 106.6221000000000000),
-(N'Trạm Dừng Phong Nha',        N'Thị trấn Phong Nha, Huyện Bố Trạch',            N'Quảng Trị',  0.00,		1, 17.5904000000000000, 106.2831000000000000),
-(N'Trạm Dừng Lệ Thủy',          N'Quốc Lộ 1A, Huyện Lệ Thủy',                     N'Quảng Trị',  0.00,      1, 17.2425945873282000, 106.8147884762850000),
-(N'Văn phòng Kiến Giang',       N'Thị trấn Kiến Giang, Huyện Lệ Thủy',            N'Quảng Trị',  0.00,      1, 17.2231000000000000, 106.7915000000000000);
+(N'Văn phòng Trần Khát Chân',   N'338 Trần Khát Chân, Thanh Nhàn, Hai Bà Trưng',                   N'Hà Nội',    0.00, 1, 21.0036000000000000, 105.8574000000000000),
+(N'Văn phòng Đình Thôn',        N'Số 1 ngõ 2 cổng làng Đình Thôn, Mỹ Đình 1, Nam Từ Liêm',         N'Hà Nội',    0.00, 1, 21.0168000000000000, 105.7783000000000000),
+(N'Văn phòng Do Lộ',            N'Liền kề 531 khu A dịch vụ Do Lộ, Yên Nghĩa, Hà Đông',            N'Hà Nội',    0.00, 1, 20.9495000000000000, 105.7485000000000000),
+-- Quảng Trị
+(N'Văn phòng Lý Thường Kiệt',   N'19A Lý Thường Kiệt, Đồng Hới',                                   N'Quảng Trị', 0.00, 1, 17.4685000000000000, 106.6176000000000000),
+(N'Văn phòng Xuân Diệu',        N'38 Xuân Diệu, Nam Lý, Đồng Hới',                                 N'Quảng Trị', 0.00, 1, 17.4750000000000000, 106.6050000000000000),
+(N'Điểm đón Đồng Lê',           N'Tiểu khu 2, Đồng Lê, Tuyên Hóa',                                 N'Quảng Trị', 0.00, 1, 17.8830000000000000, 106.0250000000000000),
+(N'Điểm đón Ba Đồn',            N'23 Hùng Vương, Ba Đồn',                                          N'Quảng Trị', 0.00, 1, 17.7536000000000000, 106.4236000000000000),
+(N'Điểm đón Hoàn Lão',          N'Hùng Vương, Hoàn Lão, Bố Trạch',                                 N'Quảng Trị', 0.00, 1, 17.5970000000000000, 106.5340000000000000),
+(N'Điểm đón Phong Nha',         N'Tổ dân phố Xuân Tiến, Phong Nha',                                N'Quảng Trị', 0.00, 1, 17.5810000000000000, 106.2860000000000000),
+(N'Văn phòng Kiến Giang',       N'Đường Nguyễn Tất Thành, Kiến Giang, Lệ Thủy',                    N'Quảng Trị', 0.00, 1, 17.2231000000000000, 106.7915000000000000),
+(N'Điểm đón Lệ Ninh',           N'Tổ dân phố 2, Lệ Ninh',                                          N'Quảng Trị', 0.00, 1, 17.1690000000000000, 106.7420000000000000);
 
 INSERT INTO [route] (routeName, totalKilometers, totalMinutes) VALUES
 (N'Hà Nội - Quảng Trị', 530.00, 640),
@@ -124,18 +124,17 @@ INSERT INTO [cargo_type] (cargoTypeName) VALUES
 PRINT N'-> Tạo đại lý 1:1 với từng điểm dừng...';
 
 INSERT INTO [ticket_agency] (stopPointId, ticketAgencyName) VALUES
-(1,  N'Đại lý Bến Xe Nước Ngầm'),
-(2,  N'Đại lý Bến Xe Giáp Bát'),
-(3,  N'Đại lý Bến Xe Mỹ Đình'),
-(4,  N'Đại lý Sân Bay Nội Bài'),
-(5,  N'Đại lý Văn phòng Cầu Giấy'),
-(6,  N'Đại lý Ba Đồn'),
-(7,  N'Đại lý Quảng Ninh'),
-(8,  N'Đại lý Văn Phòng Đồng Hới'),
-(9,  N'Đại lý Bến Xe Đồng Hới'),
-(10, N'Đại lý Phong Nha'),
-(11, N'Đại lý Lệ Thủy'),
-(12, N'Đại lý Kiến Giang');
+(1,  N'Đại lý Trần Khát Chân'),
+(2,  N'Đại lý Đình Thôn'),
+(3,  N'Đại lý Do Lộ'),
+(4,  N'Đại lý Lý Thường Kiệt'),
+(5,  N'Đại lý Xuân Diệu'),
+(6,  N'Đại lý Đồng Lê'),
+(7,  N'Đại lý Ba Đồn'),
+(8,  N'Đại lý Hoàn Lão'),
+(9,  N'Đại lý Phong Nha'),
+(10, N'Đại lý Kiến Giang'),
+(11, N'Đại lý Lệ Ninh');
 
 DECLARE @AgencyTable TABLE (RowIdx INT IDENTITY(1,1), AgencyId INT);
 INSERT INTO @AgencyTable (AgencyId) SELECT ticketAgencyId FROM [ticket_agency] ORDER BY ticketAgencyId;
@@ -279,33 +278,31 @@ PRINT N'-> Cấu hình route_stop + bảng giá...';
 
 -- Route 1: Hà Nội -> Quảng Trị (HN stops then QT stops, QL1A north->south)
 INSERT INTO [route_stop] (routeId, stopPointId, stopOrder, kilometersFromStart, minutesFromStart) VALUES
-(1, 4,  1,   0.00,   0),   -- Nội Bài (pickup đầu)
-(1, 3,  2,  35.00,  50),   -- Mỹ Đình
-(1, 5,  3,  42.00,  65),   -- Cầu Giấy
-(1, 2,  4,  55.00,  85),   -- Giáp Bát
-(1, 1,  5,  60.00,  95),   -- Nước Ngầm
-(1, 6,  6, 420.00, 480),   -- Ba Đồn
-(1, 7,  7, 450.00, 520),   -- Quảng Ninh
-(1, 8,  8, 480.00, 560),   -- VP Đồng Hới
-(1, 9,  9, 485.00, 570),   -- BX Đồng Hới
-(1, 10, 10, 505.00, 600),  -- Phong Nha
-(1, 11, 11, 520.00, 620),  -- Lệ Thủy
-(1, 12, 12, 530.00, 640);  -- Kiến Giang
+(1, 2,  1,   0.00,   0),   -- Đình Thôn
+(1, 1,  2,  15.00,  30),   -- Trần Khát Chân
+(1, 3,  3,  35.00,  55),   -- Do Lộ
+(1, 6,  4, 390.00, 455),   -- Đồng Lê
+(1, 7,  5, 425.00, 495),   -- Ba Đồn
+(1, 9,  6, 455.00, 535),   -- Phong Nha
+(1, 8,  7, 475.00, 555),   -- Hoàn Lão
+(1, 4,  8, 500.00, 585),   -- Lý Thường Kiệt
+(1, 5,  9, 505.00, 595),   -- Xuân Diệu
+(1, 10, 10, 525.00, 625),  -- Kiến Giang
+(1, 11, 11, 530.00, 640);  -- Lệ Ninh
 
 -- Route 2: reverse
 INSERT INTO [route_stop] (routeId, stopPointId, stopOrder, kilometersFromStart, minutesFromStart) VALUES
-(2, 12, 1,    0.00,   0),
-(2, 11, 2,   10.00,  20),
-(2, 10, 3,   25.00,  40),
-(2, 9,  4,   45.00,  70),
-(2, 8,  5,   50.00,  80),
-(2, 7,  6,   80.00, 120),
-(2, 6,  7,  110.00, 160),
-(2, 1,  8,  470.00, 545),
-(2, 2,  9,  475.00, 555),
-(2, 5, 10,  488.00, 575),
-(2, 3, 11,  495.00, 590),
-(2, 4, 12,  530.00, 640);
+(2, 11, 1,    0.00,   0),
+(2, 10, 2,    5.00,  15),
+(2, 5,  3,   25.00,  45),
+(2, 4,  4,   30.00,  55),
+(2, 8,  5,   55.00,  85),
+(2, 9,  6,   75.00, 105),
+(2, 7,  7,  105.00, 145),
+(2, 6,  8,  140.00, 185),
+(2, 3,  9,  495.00, 585),
+(2, 1, 10,  515.00, 610),
+(2, 2, 11,  530.00, 640);
 
 INSERT INTO [coach_type_price] (coachTypeId, seatPrice, startEffectiveDate, endEffectiveDate) VALUES
 (1, 590000.00, '2026-01-01', '2029-12-31'),
