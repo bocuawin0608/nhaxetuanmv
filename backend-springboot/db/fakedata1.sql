@@ -77,9 +77,8 @@ INSERT INTO [voucher] (voucherCode, discountValue, startEffectiveDate, endEffect
 ('GIAM50K', 50000.00, '2026-01-01', '2028-12-31', 'FIXED', 50000.00, 0.00, 1000),
 ('TET2026', 15.00, '2026-01-01', '2026-03-01', 'PERCENT', 100000.00, 300000.00, 500);
 
--- Real customer-facing locations supplied by the operator. City is the current province label.
+-- Real customer-facing locations supplied by the operator, plus the existing Nội Bài airport stop.
 -- Address must match: ^[^,]+(,\s+[^,]+)+$
--- Coordinates are approximate locality centers; verify with an approved geocoding flow before map use.
 INSERT INTO [coach_stop] (stopPointName, address, city, surcharge, isActive, latitude, longitude) VALUES
 -- Hà Nội
 (N'Văn phòng Trần Khát Chân',   N'338 Trần Khát Chân, Thanh Nhàn, Hai Bà Trưng',                   N'Hà Nội',    0.00, 1, 21.0036000000000000, 105.8574000000000000),
@@ -92,8 +91,10 @@ INSERT INTO [coach_stop] (stopPointName, address, city, surcharge, isActive, lat
 (N'Điểm đón Ba Đồn',            N'23 Hùng Vương, Ba Đồn',                                          N'Quảng Trị', 0.00, 1, 17.7536000000000000, 106.4236000000000000),
 (N'Điểm đón Hoàn Lão',          N'Hùng Vương, Hoàn Lão, Bố Trạch',                                 N'Quảng Trị', 0.00, 1, 17.5970000000000000, 106.5340000000000000),
 (N'Điểm đón Phong Nha',         N'Tổ dân phố Xuân Tiến, Phong Nha',                                N'Quảng Trị', 0.00, 1, 17.5810000000000000, 106.2860000000000000),
-(N'Văn phòng Kiến Giang',       N'Đường Nguyễn Tất Thành, Kiến Giang, Lệ Thủy',                    N'Quảng Trị', 0.00, 1, 17.2231000000000000, 106.7915000000000000),
-(N'Điểm đón Lệ Ninh',           N'Tổ dân phố 2, Lệ Ninh',                                          N'Quảng Trị', 0.00, 1, 17.1690000000000000, 106.7420000000000000);
+(N'Văn phòng Kiến Giang',       N'Đường Nguyễn Tất Thành, Kiến Giang, Lệ Thủy',                    N'Quảng Trị', 0.00,      1, 17.2231000000000000, 106.7915000000000000),
+(N'Điểm đón Lệ Ninh',           N'Tổ dân phố 2, Lệ Ninh',                                          N'Quảng Trị', 0.00,      1, 17.1690000000000000, 106.7420000000000000),
+-- Existing airport service retained in addition to the supplied locations
+(N'Sảnh T1 + T2 Sân bay Nội Bài', N'Sảnh T1 + T2, Sân bay Nội Bài, Sóc Sơn',                       N'Hà Nội',    100000.00, 1, 21.2149337000000000, 105.8007099000000000);
 
 INSERT INTO [route] (routeName, totalKilometers, totalMinutes) VALUES
 (N'Hà Nội - Quảng Trị', 530.00, 640),
@@ -134,7 +135,8 @@ INSERT INTO [ticket_agency] (stopPointId, ticketAgencyName) VALUES
 (8,  N'Đại lý Hoàn Lão'),
 (9,  N'Đại lý Phong Nha'),
 (10, N'Đại lý Kiến Giang'),
-(11, N'Đại lý Lệ Ninh');
+(11, N'Đại lý Lệ Ninh'),
+(12, N'Đại lý Sân bay Nội Bài');
 
 DECLARE @AgencyTable TABLE (RowIdx INT IDENTITY(1,1), AgencyId INT);
 INSERT INTO @AgencyTable (AgencyId) SELECT ticketAgencyId FROM [ticket_agency] ORDER BY ticketAgencyId;
@@ -278,17 +280,18 @@ PRINT N'-> Cấu hình route_stop + bảng giá...';
 
 -- Route 1: Hà Nội -> Quảng Trị (HN stops then QT stops, QL1A north->south)
 INSERT INTO [route_stop] (routeId, stopPointId, stopOrder, kilometersFromStart, minutesFromStart) VALUES
-(1, 2,  1,   0.00,   0),   -- Đình Thôn
-(1, 1,  2,  15.00,  30),   -- Trần Khát Chân
-(1, 3,  3,  35.00,  55),   -- Do Lộ
-(1, 6,  4, 390.00, 455),   -- Đồng Lê
-(1, 7,  5, 425.00, 495),   -- Ba Đồn
-(1, 9,  6, 455.00, 535),   -- Phong Nha
-(1, 8,  7, 475.00, 555),   -- Hoàn Lão
-(1, 4,  8, 500.00, 585),   -- Lý Thường Kiệt
-(1, 5,  9, 505.00, 595),   -- Xuân Diệu
-(1, 10, 10, 525.00, 625),  -- Kiến Giang
-(1, 11, 11, 530.00, 640);  -- Lệ Ninh
+(1, 12,  1,   0.00,   0),   -- Sân bay Nội Bài
+(1, 2,   2,  35.00,  50),   -- Đình Thôn
+(1, 1,   3,  50.00,  80),   -- Trần Khát Chân
+(1, 3,   4,  70.00, 105),   -- Do Lộ
+(1, 6,   5, 390.00, 455),   -- Đồng Lê
+(1, 7,   6, 425.00, 495),   -- Ba Đồn
+(1, 9,   7, 455.00, 535),   -- Phong Nha
+(1, 8,   8, 475.00, 555),   -- Hoàn Lão
+(1, 4,   9, 500.00, 585),   -- Lý Thường Kiệt
+(1, 5,  10, 505.00, 595),   -- Xuân Diệu
+(1, 10, 11, 525.00, 625),   -- Kiến Giang
+(1, 11, 12, 530.00, 640);   -- Lệ Ninh
 
 -- Route 2: reverse
 INSERT INTO [route_stop] (routeId, stopPointId, stopOrder, kilometersFromStart, minutesFromStart) VALUES
@@ -300,9 +303,10 @@ INSERT INTO [route_stop] (routeId, stopPointId, stopOrder, kilometersFromStart, 
 (2, 9,  6,   75.00, 105),
 (2, 7,  7,  105.00, 145),
 (2, 6,  8,  140.00, 185),
-(2, 3,  9,  495.00, 585),
-(2, 1, 10,  515.00, 610),
-(2, 2, 11,  530.00, 640);
+(2, 3,  9,  460.00, 535),
+(2, 1, 10,  480.00, 560),
+(2, 2, 11,  495.00, 590),
+(2, 12, 12, 530.00, 640);
 
 INSERT INTO [coach_type_price] (coachTypeId, seatPrice, startEffectiveDate, endEffectiveDate) VALUES
 (1, 590000.00, '2026-01-01', '2029-12-31'),

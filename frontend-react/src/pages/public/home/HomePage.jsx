@@ -356,7 +356,6 @@ const HomePage = () => {
     const [date, setDate] = useState('');
     const [returnDate, setReturnDate] = useState('');
     const [routes, setRoutes] = useState([]);
-    const [locationsStatus, setLocationsStatus] = useState('loading');
     const [searchHistory, setSearchHistory] = useState(readSearchHistory);
     const [trips, setTrips] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -375,14 +374,8 @@ const HomePage = () => {
     useEffect(() => {
         tripService
             .getCustomerRouteLocations()
-            .then((locations) => {
-                setRoutes(locations);
-                setLocationsStatus('ready');
-            })
-            .catch(() => {
-                setRoutes([]);
-                setLocationsStatus('error');
-            });
+            .then(setRoutes)
+            .catch(() => setRoutes([]));
     }, []);
 
     useEffect(() => {
@@ -826,12 +819,6 @@ const HomePage = () => {
                     <div className="office-section-container">
                         <h3 className="office-section-title">Liên hệ</h3>
                         <div className="office-grid-layout">
-                            {locationsStatus === 'loading' && (
-                                <p className="office-status">Đang tải địa chỉ văn phòng...</p>
-                            )}
-                            {locationsStatus === 'error' && (
-                                <p className="office-status office-status-error">Chưa thể tải địa chỉ văn phòng.</p>
-                            )}
                             {Object.entries(officeLocations).map(([city, stops]) => (
                                 <div className="office-card" key={city}>
                                     <div className="office-card-header">VP {city}</div>
