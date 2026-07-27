@@ -1,31 +1,36 @@
+import { Link } from 'react-router-dom';
 import { Container, Row, Col } from 'react-bootstrap';
-import { 
-  FaFacebookF, FaInstagram, FaYoutube, FaPhone, FaMapMarkerAlt, FaEnvelope 
+import {
+  FaFacebookF, FaInstagram, FaYoutube, FaPhone, FaMapMarkerAlt, FaEnvelope
 } from 'react-icons/fa';
+
+const HOTLINE_DISPLAY = '0914.077.779';
+const HOTLINE_TEL = '0914077779';
+const HEAD_OFFICE = '338 Trần Khát Chân, Thanh Nhàn, Hai Bà Trưng, Hà Nội';
 
 export default function PublicFooter() {
   return (
     <footer style={{ backgroundColor: 'var(--ralsei-green)', color: 'var(--ralsei-black)' }} className="pt-5 pb-4 mt-auto">
       <Container>
         <Row className="gy-5">
-          
+
           {/* Cột 1: Logo + Giới thiệu */}
           <Col lg={5} md={6}>
             <div className="d-flex align-items-center mb-3">
-              <img 
-                src="/images/ralseiiii.jpg" 
-                alt="Ralsei Logo" 
-                height="65" 
-                className="rounded me-3 bg-white shadow-sm" 
+              <img
+                src="/images/ralseiiii.jpg"
+                alt="Ralsei Logo"
+                height="65"
+                className="rounded me-3 bg-white shadow-sm"
               />
               <div>
                 <h5 className="fw-bold mb-0 text-uppercase">HOLA RALSEI</h5>
                 <small className="opacity-75">Du lịch - Xe khách chất lượng cao</small>
               </div>
             </div>
-            
+
             <p className="opacity-80 mb-4" style={{ fontSize: '0.95rem', lineHeight: '1.7' }}>
-              Nhà xe Ralsei tự hào mang đến dịch vụ vận chuyển hành khách uy tín, 
+              Nhà xe Ralsei tự hào mang đến dịch vụ vận chuyển hành khách uy tín,
               an toàn và tiện nghi nhất trên các tuyến đường lớn.
             </p>
 
@@ -42,14 +47,12 @@ export default function PublicFooter() {
             </div>
           </Col>
 
-          {/* Cột 2: Liên kết nhanh */}
+          {/* Cột 2: Dịch vụ */}
           <Col lg={2} md={6} sm={6}>
             <h6 className="fw-bold mb-3 text-uppercase">Dịch vụ</h6>
             <ul className="list-unstyled mb-0" style={{ fontSize: '0.95rem', lineHeight: '2' }}>
-              <li><a href="/routes" className="text-decoration-none">Lịch trình</a></li>
-              <li><a href="/booking" className="text-decoration-none">Đặt vé</a></li>
-              <li><a href="#" className="text-decoration-none">Vé tháng</a></li>
-              <li><a href="#" className="text-decoration-none">Xe VIP</a></li>
+              <li><Link to="/" className="text-decoration-none">Đặt vé</Link></li>
+              <li><Link to="/cargo-history" className="text-decoration-none">Đơn hàng</Link></li>
             </ul>
           </Col>
 
@@ -67,19 +70,20 @@ export default function PublicFooter() {
           {/* Cột 4: Thông tin liên hệ */}
           <Col lg={3} md={6}>
             <h6 className="fw-bold mb-3 text-uppercase">Liên hệ</h6>
-            
+
             <div className="d-flex align-items-start gap-3 mb-3">
               <FaMapMarkerAlt className="mt-1" />
               <div style={{ fontSize: '0.95rem' }}>
-                FPT University, Hòa Lạc, Thạch Thất, Hà Nội
+                <div className="fw-semibold">Trụ sở</div>
+                {HEAD_OFFICE}
               </div>
             </div>
 
             <div className="d-flex align-items-center gap-3 mb-3">
               <FaPhone className="" />
               <div>
-                <a href="tel:19001234" className="text-decoration-none">
-                  1900 1234
+                <a href={`tel:${HOTLINE_TEL}`} className="text-decoration-none">
+                  {HOTLINE_DISPLAY}
                 </a>
               </div>
             </div>
