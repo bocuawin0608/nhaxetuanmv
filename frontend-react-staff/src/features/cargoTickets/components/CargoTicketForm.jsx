@@ -19,10 +19,19 @@ const EMPTY_FORM = {
 
 const MAX_CARGO_VOLUME_M3 = 2.5;
 
+/** Prefers nested payment.paymentMethod from API ticket responses. */
+function resolveInitialPaymentMethod(initialData) {
+    const feePayer = initialData?.feePayer ?? EMPTY_FORM.feePayer;
+    if (feePayer === 'RECEIVER') return '';
+    return initialData?.payment?.paymentMethod
+        ?? initialData?.paymentMethod
+        ?? EMPTY_FORM.paymentMethod;
+}
+
 /**
  * Ticket-staff cargo form.
- * Pickup is always the authenticated agency stop; staff only choose dropoff
- * (and optionally a matching outbound trip).
+ * Pickup is always the authenticated agency stop; staff only choose dropoff.
+ * Trip assignment is deferred on create; Eligible Trip appears on update only.
  */
 export default function CargoTicketForm({
     initialData,
@@ -37,7 +46,11 @@ export default function CargoTicketForm({
         soldBy: initialData?.soldBy?.staffId ?? initialData?.soldBy ?? EMPTY_FORM.soldBy,
         tripId: initialData?.tripId ?? EMPTY_FORM.tripId,
         pickupStopId: initialData?.pickupStopId ?? lockedTrip?.pickupStopId ?? EMPTY_FORM.pickupStopId,
-        dropoffStopId: initialData?.dropoffStopId ?? EMPTY_FORM.dropoffStopId
+        dropoffStopId: initialData?.dropoffStopId ?? EMPTY_FORM.dropoffStopId,
+        feePayer: initialData?.feePayer ?? EMPTY_FORM.feePayer,
+        paymentMethod: resolveInitialPaymentMethod(initialData),
+        codAmount: initialData?.codAmount ?? EMPTY_FORM.codAmount,
+        description: initialData?.description ?? EMPTY_FORM.description
     }));
     const [draftDetails, setDraftDetails] = useState(() =>
         initialData?.details ? structuredClone(initialData.details) : []
@@ -45,6 +58,7 @@ export default function CargoTicketForm({
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
     const { user } = useAuth();
+    const isCreate = requireDimensions;
     const {
         trips,
         stops,
@@ -56,7 +70,9 @@ export default function CargoTicketForm({
         agencyCity,
         defaultRouteId,
         defaultRouteName
-    } = useCargoTicketFormOptions(formData.pickupStopId, formData.dropoffStopId);
+    } = useCargoTicketFormOptions(formData.pickupStopId, formData.dropoffStopId, {
+        loadTrips: !isCreate
+    });
 
     const [selectedRouteId, setSelectedRouteId] = useState(() => {
         if (lockedTrip?.routeId) return String(lockedTrip.routeId);
@@ -67,8 +83,9 @@ export default function CargoTicketForm({
     const [routeLabel, setRouteLabel] = useState(
         () => lockedTrip?.routeName || initialData?.routeName || ''
     );
-    const hasLockedTrip = Boolean(lockedTrip);
-    const isCreate = requireDimensions;
+    const hasLockedTrip = Boolean(lockedTrip) && !isCreate;
+    const isPaid = initialData?.payment?.status === 'COMPLETED';
+    const moneyFieldsLocked = isPaid;
 
     const lockedPickupStopId = lockedTrip?.pickupStopId
         || agencyPickupStopId
@@ -136,17 +153,25 @@ export default function CargoTicketForm({
         [trips, stops, formData.pickupStopId, formData.dropoffStopId]
     );
 
-    // Keep selected trip if still eligible after options refresh (update prefill).
-    useEffect(() => {
-        if (!formData.tripId || optionsLoading) return;
-        if (eligibleTrips.length === 0) return;
-        const stillValid = eligibleTrips.some(
+    // Keep the current trip visible even when it drops out of the eligible list
+    // (departed / filtered). Staff must clear or change it explicitly.
+    const tripSelectOptions = useMemo(() => {
+        if (!formData.tripId) return eligibleTrips;
+        const stillListed = eligibleTrips.some(
             (trip) => String(trip.tripId) === String(formData.tripId)
         );
-        if (!stillValid && !hasLockedTrip) {
-            setFormData((previous) => ({ ...previous, tripId: '' }));
-        }
-    }, [eligibleTrips, formData.tripId, optionsLoading, hasLockedTrip]);
+        if (stillListed) return eligibleTrips;
+        return [
+            {
+                tripId: formData.tripId,
+                departureTime: null,
+                status: null,
+                coachTypeName: null,
+                staleCurrent: true
+            },
+            ...eligibleTrips
+        ];
+    }, [eligibleTrips, formData.tripId]);
 
     const stopsForRoute = useMemo(() => {
         if (!selectedRouteId || !routeDetail?.routeStops?.length) return [];
@@ -207,6 +232,9 @@ export default function CargoTicketForm({
 
     const handleChange = (event) => {
         const { name, value } = event.target;
+        if (moneyFieldsLocked && (name === 'feePayer' || name === 'paymentMethod')) {
+            return;
+        }
         setFormData((previous) => ({
             ...previous,
             [name]: value,
@@ -267,6 +295,15 @@ export default function CargoTicketForm({
 
         const payload = buildCargoTicketRequest({
             ...formData,
+            // Create always defers trip assignment (UC-19 / Assign board).
+            tripId: isCreate ? '' : formData.tripId,
+            // Paid orders must echo the collected payment method (never the form default).
+            paymentMethod: moneyFieldsLocked
+                ? (initialData?.payment?.paymentMethod ?? formData.paymentMethod)
+                : formData.paymentMethod,
+            feePayer: moneyFieldsLocked
+                ? (initialData?.feePayer ?? formData.feePayer)
+                : formData.feePayer,
             pickupStopId: lockedPickupStopId || formData.pickupStopId
         }, draftDetails);
         setSubmitting(true);
@@ -302,14 +339,14 @@ export default function CargoTicketForm({
                 </Card.Header>
                 <Card.Body className="p-4">
                     <Row className="g-3">
-                        <Col md={hasLockedTrip ? 6 : 4}>
+                        <Col md={6}>
                             <PickupSummary
                                 stopName={lockedPickupName}
                                 city={lockedPickupCity}
                                 routeName={routeLabel || defaultRouteName}
                             />
                         </Col>
-                        <Col md={hasLockedTrip ? 6 : 4}>
+                        <Col md={6}>
                             <Dropdown
                                 label="Điểm trả"
                                 name="dropoffStopId"
@@ -324,25 +361,39 @@ export default function CargoTicketForm({
                                 emptyLabel={!selectedRouteId ? '-- Đang chọn tuyến --' : '-- Chọn điểm trả --'}
                             />
                         </Col>
-                        {!hasLockedTrip && (
-                            <Col md={4}>
+                        {!isCreate && !hasLockedTrip && (
+                            <Col md={12}>
                                 <Dropdown
                                     label="Chuyến đi phù hợp (có thể gán sau)"
                                     name="tripId"
                                     value={formData.tripId ?? ''}
                                     onChange={handleChange}
                                     loading={optionsLoading}
-                                    options={eligibleTrips}
+                                    options={tripSelectOptions}
                                     optionValue="tripId"
                                     renderOption={tripLabel}
                                     disabled={!formData.pickupStopId || !formData.dropoffStopId}
                                     emptyLabel="-- Gán chuyến sau --"
                                 />
+                                {!isPaid && formData.feePayer === 'SENDER' && (
+                                    <Form.Text className="text-muted">
+                                        Gán hoặc đổi chuyến chỉ khi người gửi đã thanh toán xong
+                                        (hoặc dùng màn Gán hàng sau khi trả).
+                                    </Form.Text>
+                                )}
                             </Col>
                         )}
-                        {hasLockedTrip && (
+                        {!isCreate && hasLockedTrip && (
                             <Col md={12}>
                                 <CoachSummary lockedTrip={lockedTrip} />
+                            </Col>
+                        )}
+                        {isCreate && (
+                            <Col xs={12}>
+                                <Form.Text className="text-muted">
+                                    Đơn mới luôn chưa gán chuyến. Gán xe sau ở màn Gửi hàng → Xem chuyến xe / Gán hàng,
+                                    hoặc khi cập nhật đơn đang chờ.
+                                </Form.Text>
                             </Col>
                         )}
                     </Row>
@@ -355,29 +406,32 @@ export default function CargoTicketForm({
                 </Card.Header>
                 <Card.Body className="p-4">
                     <Row className="g-3">
-                        {!isCreate && (
-                            <Col md={4}>
-                                <Field
-                                    label="Tiền thu hộ COD (VNĐ)"
-                                    name="codAmount"
-                                    type="number"
-                                    value={formData.codAmount}
-                                    onChange={handleChange}
-                                    required
-                                    min="0"
-                                />
-                            </Col>
-                        )}
-                        <Col md={isCreate ? 6 : 4}>
+                        <Col md={4}>
+                            <Field
+                                label="Tiền thu hộ COD (VNĐ)"
+                                name="codAmount"
+                                type="number"
+                                value={formData.codAmount ?? 0}
+                                onChange={handleChange}
+                                required
+                                min="0"
+                            />
+                        </Col>
+                        <Col md={4}>
                             <Form.Group>
                                 <Form.Label className="fw-semibold">Người trả phí *</Form.Label>
-                                <Form.Select name="feePayer" value={formData.feePayer} onChange={handleChange}>
+                                <Form.Select
+                                    name="feePayer"
+                                    value={formData.feePayer}
+                                    onChange={handleChange}
+                                    disabled={moneyFieldsLocked}
+                                >
                                     <option value="SENDER">Người gửi</option>
                                     <option value="RECEIVER">Người nhận</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col md={isCreate ? 6 : 4}>
+                        <Col md={4}>
                             <Form.Group>
                                 <Form.Label className="fw-semibold">
                                     Phương thức thanh toán{formData.feePayer === 'SENDER' ? ' *' : ''}
@@ -387,7 +441,7 @@ export default function CargoTicketForm({
                                     value={formData.feePayer === 'RECEIVER' ? '' : formData.paymentMethod}
                                     onChange={handleChange}
                                     required={formData.feePayer === 'SENDER'}
-                                    disabled={formData.feePayer === 'RECEIVER'}
+                                    disabled={moneyFieldsLocked || formData.feePayer === 'RECEIVER'}
                                 >
                                     {formData.feePayer === 'RECEIVER' ? (
                                         <option value="">Chọn lúc nhận hàng ở văn phòng đích</option>
@@ -398,27 +452,34 @@ export default function CargoTicketForm({
                                         </>
                                     )}
                                 </Form.Select>
-                                {formData.feePayer === 'RECEIVER' && (
+                                {formData.feePayer === 'RECEIVER' && !moneyFieldsLocked && (
                                     <Form.Text className="text-muted">
                                         Người nhận sẽ chọn tiền mặt hoặc chuyển khoản khi lấy hàng.
                                     </Form.Text>
                                 )}
                             </Form.Group>
                         </Col>
-                        {!isCreate && (
+                        {moneyFieldsLocked && (
                             <Col xs={12}>
-                                <Form.Group>
-                                    <Form.Label className="fw-semibold">Mô tả hàng hóa</Form.Label>
-                                    <Form.Control
-                                        as="textarea"
-                                        rows={3}
-                                        name="description"
-                                        value={formData.description || ''}
-                                        onChange={handleChange}
-                                    />
-                                </Form.Group>
+                                <Alert variant="warning" className="mb-0 py-2 small">
+                                    Đơn đã thanh toán: người trả phí, phương thức và chi tiết hàng hóa (ảnh hưởng cước)
+                                    bị khóa. Muốn đổi tiền cước/hàng, hãy hủy đơn và tạo đơn mới. Vẫn có thể sửa COD,
+                                    liên hệ, điểm trả, chuyến và mô tả đơn.
+                                </Alert>
                             </Col>
                         )}
+                        <Col xs={12}>
+                            <Form.Group>
+                                <Form.Label className="fw-semibold">Mô tả đơn hàng</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    rows={3}
+                                    name="description"
+                                    value={formData.description || ''}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+                        </Col>
                     </Row>
                 </Card.Body>
             </Card>
@@ -428,6 +489,7 @@ export default function CargoTicketForm({
                 onAdd={handleAddDetail}
                 onChange={handleDetailChange}
                 onRemove={handleRemoveDetail}
+                readOnly={moneyFieldsLocked}
             />
 
             {occupiedVolume > MAX_CARGO_VOLUME_M3 && (
@@ -525,6 +587,9 @@ const TRIP_STATUS_MAP = {
 };
 
 const tripLabel = (trip) => {
+    if (trip.staleCurrent) {
+        return `Mã: ${trip.tripId} — chuyến hiện tại (không còn trong danh sách)`;
+    }
     const time = trip.departureTime ? formatDateTime(trip.departureTime) : 'Chưa có giờ';
     const localizedStatus = trip.status ? (TRIP_STATUS_MAP[trip.status] || trip.status) : '';
     const coachType = trip.coachTypeName ? ` - Loại xe: ${trip.coachTypeName}` : '';
@@ -616,7 +681,7 @@ function buildCargoTicketRequest(form, draftDetails) {
         totalPrice: totalFromDetails > 0 ? totalFromDetails : Number(form.totalPrice) || 0,
         description: optionalText(form.description),
         feePayer: form.feePayer,
-        codAmount: Number(form.codAmount),
+        codAmount: Number.isFinite(Number(form.codAmount)) ? Number(form.codAmount) : 0,
         pickupStopId: Number(form.pickupStopId),
         dropoffStopId: Number(form.dropoffStopId),
         status: form.status,
@@ -628,7 +693,8 @@ function buildCargoTicketRequest(form, draftDetails) {
             description: optionalText(d.description),
             quantity: Number(d.quantity),
             weightKg: Number(d.weightKg),
-            dimensionVol: Number(d.dimensionVol)
+            // Stabilize volume so paid trip-only updates do not look like price edits.
+            dimensionVol: Number(Number(d.dimensionVol).toFixed(6))
         }))
     };
 }

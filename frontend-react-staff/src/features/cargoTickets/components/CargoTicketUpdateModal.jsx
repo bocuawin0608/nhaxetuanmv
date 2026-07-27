@@ -14,10 +14,18 @@ export default function CargoTicketUpdateModal({ data, onClose, onSuccess }) {
             cargoTicketApi.getCargoTicketDetails(data.cargoTicketId).catch(() => [])
         ])
             .then(([full, details]) => {
-                if (!cancelled) setTicket({ ...full, details });
+                if (cancelled) return;
+                // Prefer full GET (includes nested payment); fall back to queue row payment.
+                setTicket({
+                    ...full,
+                    details,
+                    payment: full?.payment ?? data.payment ?? null
+                });
             })
             .catch(() => {
-                if (!cancelled) setTicket({ ...data, details: [] });
+                if (!cancelled) {
+                    setTicket({ ...data, details: [], payment: data.payment ?? null });
+                }
             });
         return () => { cancelled = true; };
     }, [data]);
@@ -35,7 +43,14 @@ export default function CargoTicketUpdateModal({ data, onClose, onSuccess }) {
             <Modal.Header closeButton><Modal.Title>Cập nhật đơn gửi hàng</Modal.Title></Modal.Header>
             <Modal.Body className="p-4">{ticket === null
                 ? <div className="text-center p-5"><Spinner size="sm" /> Đang tải thông tin hiện tại...</div>
-                : <CargoTicketForm initialData={ticket} onSubmit={handleSubmit} submitLabel="Lưu thay đổi" />}
+                : (
+                    <CargoTicketForm
+                        key={ticket.cargoTicketId}
+                        initialData={ticket}
+                        onSubmit={handleSubmit}
+                        submitLabel="Lưu thay đổi"
+                    />
+                )}
             </Modal.Body>
         </Modal>
     );

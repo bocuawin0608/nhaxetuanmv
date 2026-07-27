@@ -419,7 +419,8 @@ public class CargoTicketServiceImpl implements CargoTicketService {
         CargoTicket ticket = findByIdOrThrow(id);
         requirePending(ticket, "Chỉ đơn đang chờ mới được cập nhật.");
         Payment payment = cargoTicketPaymentPolicy.findPayment(ticket);
-        guardPaidOrderMoneyFields(ticket, payment, request, ticket.getTotalPrice());
+        // Header update does not recompute freight; amount is guarded only when details change.
+        guardPaidOrderFeeFields(ticket, payment, request);
 
         BigDecimal existingTotal = ticket.getTotalPrice();
         String ticketCode = ticket.getTicketCode();
@@ -480,11 +481,18 @@ public class CargoTicketServiceImpl implements CargoTicketService {
                 .map(detail -> CargoVolumePolicy.occupiedVolume(
                         detail.getDimensionVol(), detail.getQuantity()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        boolean freightInputsChanged = !sameFreightInputs(existing, request.getDetails());
         BigDecimal requestedTotal = request.getDetails().stream()
                 .map(detail -> calculateDetailPrice(
                         detail.getCargoTypePriceId(), detail.getDimensionVol(), detail.getQuantity()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        guardPaidOrderMoneyFields(ticket, existingPayment, request, requestedTotal);
+
+        guardPaidOrderFeeFields(ticket, existingPayment, request);
+        // Paid orders may still change trip/contacts. Only reject when freight inputs
+        // would change the collected amount (AF-2). Avoid false rejects from recalc drift.
+        if (freightInputsChanged) {
+            guardPaidOrderAmount(existingPayment, requestedTotal);
+        }
 
         CargoVolumePolicy.validateOrderVolume(requestedVolume);
         updateCargoTicket(id, request);
@@ -509,15 +517,25 @@ public class CargoTicketServiceImpl implements CargoTicketService {
             detail.setQuantity(detailRequest.getQuantity());
             detail.setWeightKg(detailRequest.getWeightKg());
             detail.setDimensionVol(detailRequest.getDimensionVol());
-            detail.setCalculatedPrice(calculateDetailPrice(detailRequest.getCargoTypePriceId(),
-                    detailRequest.getDimensionVol(), detailRequest.getQuantity()));
+            if (cargoTicketPaymentPolicy.isCompleted(existingPayment) && !freightInputsChanged) {
+                // Keep the amount that was already collected.
+                if (detail.getCalculatedPrice() == null) {
+                    detail.setCalculatedPrice(calculateDetailPrice(detailRequest.getCargoTypePriceId(),
+                            detailRequest.getDimensionVol(), detailRequest.getQuantity()));
+                }
+            } else {
+                detail.setCalculatedPrice(calculateDetailPrice(detailRequest.getCargoTypePriceId(),
+                        detailRequest.getDimensionVol(), detailRequest.getQuantity()));
+            }
             replacements.add(detail);
         }
 
         cargoTicketDetailRepository.deleteAll(existingById.values());
         cargoTicketDetailRepository.saveAll(replacements);
         cargoTicketDetailRepository.flush();
-        updateTicketTotalPrice(ticket);
+        if (!(cargoTicketPaymentPolicy.isCompleted(existingPayment) && !freightInputsChanged)) {
+            updateTicketTotalPrice(ticket);
+        }
         return mapToResponse(ticket);
     }
 
@@ -958,6 +976,13 @@ public class CargoTicketServiceImpl implements CargoTicketService {
 
     private void guardPaidOrderMoneyFields(
             CargoTicket ticket, Payment payment, CargoTicketRequest request, BigDecimal nextTotal) {
+        guardPaidOrderFeeFields(ticket, payment, request);
+        guardPaidOrderAmount(payment, nextTotal);
+    }
+
+    /** AF-2: paid orders cannot change fee payer or payment method. COD is independent of freight. */
+    private void guardPaidOrderFeeFields(
+            CargoTicket ticket, Payment payment, CargoTicketRequest request) {
         if (!cargoTicketPaymentPolicy.isCompleted(payment)) {
             return;
         }
@@ -969,9 +994,57 @@ public class CargoTicketServiceImpl implements CargoTicketService {
                 && !request.getPaymentMethod().equalsIgnoreCase(payment.getPaymentMethod())) {
             cargoTicketPaymentPolicy.rejectMoneyChangesWhenPaid(payment);
         }
+    }
+
+    /** AF-2: paid orders cannot change freight amount. */
+    private void guardPaidOrderAmount(Payment payment, BigDecimal nextTotal) {
+        if (!cargoTicketPaymentPolicy.isCompleted(payment)) {
+            return;
+        }
         if (nextTotal != null && payment.getAmount().compareTo(nextTotal) != 0) {
             cargoTicketPaymentPolicy.rejectMoneyChangesWhenPaid(payment);
         }
+    }
+
+    /**
+     * Freight amount depends on cargo type price, quantity, and volume only.
+     * Trip / contact / COD / weight-only edits must not look like money changes.
+     */
+    private boolean sameFreightInputs(
+            List<CargoTicketDetail> existing, List<CargoTicketDetailRequest> requested) {
+        if (existing == null || requested == null || existing.size() != requested.size()) {
+            return false;
+        }
+        var existingById = existing.stream().collect(java.util.stream.Collectors.toMap(
+                CargoTicketDetail::getCargoTicketDetailId, detail -> detail));
+        for (CargoTicketDetailRequest detailRequest : requested) {
+            if (detailRequest.getCargoTicketDetailId() == null) {
+                return false;
+            }
+            CargoTicketDetail current = existingById.remove(detailRequest.getCargoTicketDetailId());
+            if (current == null) {
+                return false;
+            }
+            if (current.getCargoTypePriceId() != detailRequest.getCargoTypePriceId()) {
+                return false;
+            }
+            if (current.getQuantity() != detailRequest.getQuantity()) {
+                return false;
+            }
+            if (!sameVolume(current.getDimensionVol(), detailRequest.getDimensionVol())) {
+                return false;
+            }
+        }
+        return existingById.isEmpty();
+    }
+
+    private boolean sameVolume(BigDecimal left, BigDecimal right) {
+        if (left == null || right == null) {
+            return false;
+        }
+        // Tolerate JSON/JS float noise around stored DECIMAL volumes.
+        return left.setScale(6, java.math.RoundingMode.HALF_UP)
+                .compareTo(right.setScale(6, java.math.RoundingMode.HALF_UP)) == 0;
     }
 
     private void validateReferences(CargoTicketRequest request) {
@@ -1044,8 +1117,9 @@ public class CargoTicketServiceImpl implements CargoTicketService {
 
     /**
      * Replaces client-owned create values with facts controlled by the staff
-     * workflow. The pickup office and seller come from the authenticated account;
-     * aggregate description and COD are not collected by the streamlined form.
+     * workflow. The pickup office and seller come from the authenticated account.
+     * COD and order-level description are taken from the form (COD defaults to 0
+     * when omitted).
      *
      * @param request cargo order being created
      * @param currentStaff authenticated ticket-office staff member
@@ -1056,8 +1130,9 @@ public class CargoTicketServiceImpl implements CargoTicketService {
                 .orElseThrow(() -> new BusinessRuleException("Văn phòng vé của nhân viên không hoạt động."));
         request.setPickupStopId(agency.getStopPointId());
         request.setSoldBy(currentStaff);
-        request.setDescription(null);
-        request.setCodAmount(BigDecimal.ZERO);
+        if (request.getCodAmount() == null) {
+            request.setCodAmount(BigDecimal.ZERO);
+        }
     }
 
     private void requireStop(int id) {

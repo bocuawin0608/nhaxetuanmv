@@ -188,7 +188,8 @@ public class CargoTicketPaymentPolicy {
     public void rejectMoneyChangesWhenPaid(Payment payment) {
         if (isCompleted(payment)) {
             throw new BusinessRuleException(
-                    "Đơn đã thanh toán, không thể đổi người trả phí, phương thức hoặc số tiền. Hãy hủy đơn nếu cần.");
+                    "Đơn đã thanh toán, không thể đổi người trả phí, phương thức hoặc số tiền cước. "
+                            + "Hãy hủy đơn và tạo đơn mới nếu cần.");
         }
     }
 

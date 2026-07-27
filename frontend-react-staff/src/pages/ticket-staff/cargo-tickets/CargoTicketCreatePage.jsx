@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Alert, Button, Container } from 'react-bootstrap';
 import { BsArrowLeft } from 'react-icons/bs';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import CargoTicketForm from '../../../features/cargoTickets/components/CargoTicketForm';
 import CargoConfirmModal from '../../../features/cargoTickets/components/CargoConfirmModal';
 import QrPaymentModal from '../../../features/cargoTickets/components/QrPaymentModal';
@@ -10,8 +10,6 @@ import { formatCurrency } from '../../../utils/formatters';
 
 export default function CargoTicketCreatePage() {
     const navigate = useNavigate();
-    const { state } = useLocation();
-    const selectedTrip = state?.trip;
     const [qrTicket, setQrTicket] = useState(null);
     const [submitError, setSubmitError] = useState(null);
     const [pendingPayload, setPendingPayload] = useState(null);
@@ -113,10 +111,6 @@ export default function CargoTicketCreatePage() {
             <h2 className="mb-4 fw-bold text-dark">Thêm đơn gửi hàng</h2>
             {submitError && <Alert variant="danger">{submitError}</Alert>}
             <CargoTicketForm
-                initialData={selectedTrip
-                    ? { tripId: selectedTrip.tripId, pickupStopId: selectedTrip.pickupStopId }
-                    : undefined}
-                lockedTrip={selectedTrip || undefined}
                 requireDimensions
                 onSubmit={handleSubmit}
             />

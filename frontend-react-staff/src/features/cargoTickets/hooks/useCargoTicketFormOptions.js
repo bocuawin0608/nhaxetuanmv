@@ -2,8 +2,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { cargoTicketApi } from '../api/cargoTicketApi';
 import { routeApi } from '../../routes/api/routeApi';
 
-export function useCargoTicketFormOptions(pickupStopId, dropoffStopId) {
-    const [options, setOptions] = useState({
+/**
+ * @param {string|number} pickupStopId
+ * @param {string|number} dropoffStopId
+ * @param {{ loadTrips?: boolean }} [options] Create flow skips trip fetch (assignment deferred).
+ */
+export function useCargoTicketFormOptions(pickupStopId, dropoffStopId, options = {}) {
+    const loadTrips = options.loadTrips !== false;
+    const [formOptions, setFormOptions] = useState({
         trips: [],
         customers: [],
         stops: [],
@@ -31,7 +37,7 @@ export function useCargoTicketFormOptions(pickupStopId, dropoffStopId) {
                     cargoTicketApi.getFormOptions(),
                     routeApi.getRoutesForDropdown()
                 ]);
-                setOptions(prev => ({
+                setFormOptions(prev => ({
                     ...prev,
                     customers: data.customers ?? [],
                     stops: data.stops ?? [],
@@ -49,26 +55,26 @@ export function useCargoTicketFormOptions(pickupStopId, dropoffStopId) {
             }
 
             const hasStops = pickupStopId && dropoffStopId && String(pickupStopId) !== String(dropoffStopId);
-            if (hasStops) {
+            if (loadTrips && hasStops) {
                 const requestNumber = ++latestTripRequest.current;
                 const tripsData = await cargoTicketApi.getTripsByStops({ pickupStopId, dropoffStopId });
                 if (requestNumber === latestTripRequest.current) {
-                    setOptions(prev => ({ ...prev, trips: tripsData }));
+                    setFormOptions(prev => ({ ...prev, trips: tripsData }));
                 }
             } else {
-                setOptions(prev => ({ ...prev, trips: [] }));
+                setFormOptions(prev => ({ ...prev, trips: [] }));
             }
         } catch (requestError) {
             setError(requestError.response?.data?.message || 'Không thể tải dữ liệu danh mục.');
         } finally {
             setLoading(false);
         }
-    }, [pickupStopId, dropoffStopId]);
+    }, [pickupStopId, dropoffStopId, loadTrips]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         loadOptions();
     }, [loadOptions]);
 
-    return { ...options, loading, error };
+    return { ...formOptions, loading, error };
 }
