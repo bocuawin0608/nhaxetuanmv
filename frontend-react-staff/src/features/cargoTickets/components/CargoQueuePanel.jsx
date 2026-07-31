@@ -11,6 +11,7 @@ import CargoTicketUpdateModal from './CargoTicketUpdateModal';
 import CargoTicketDetailViewModal from './CargoTicketDetailViewModal';
 import CargoConfirmModal from './CargoConfirmModal';
 import QrPaymentModal from './QrPaymentModal';
+import EditPaymentMethodModal from './EditPaymentMethodModal';
 
 const QUEUE_STATUS_PRESENTATION = {
     RECEIVED: { label: 'Đang chờ', badge: 'primary' },
@@ -51,6 +52,11 @@ function needsReceiverPaymentChoice(ticket) {
     return ticket.feePayer === 'RECEIVER' && !ticket.payment;
 }
 
+/** Payment exists but is not yet completed — staff can still switch the method. */
+function canEditPaymentMethod(ticket) {
+    return ticket.payment && ticket.payment.status !== 'COMPLETED';
+}
+
 function canConfirmDeliver(ticket) {
     if (ticket.feePayer !== 'RECEIVER') return true;
     // Method not chosen yet — staff picks cash/bank at hand-off.
@@ -78,6 +84,8 @@ export default function CargoQueuePanel({
     const [actionId, setActionId] = useState(null);
     const [confirmDialog, setConfirmDialog] = useState(null);
     const [receiverPayTicket, setReceiverPayTicket] = useState(null);
+    const [editPaymentTicket, setEditPaymentTicket] = useState(null);
+    // Edit-payment modal manages its own busy state internally.
 
     const busy = actionId != null;
     const qrOpenFor = (ticket) => qrTicket?.cargoTicketId === ticket.cargoTicketId;
@@ -91,6 +99,8 @@ export default function CargoQueuePanel({
         if (actionId != null) return;
         setReceiverPayTicket(null);
     };
+
+
 
     const runAction = async (id, action) => {
         setActionId(id);
@@ -370,6 +380,16 @@ export default function CargoQueuePanel({
                                         <BsCashCoin />
                                     </Button>
                                 )}
+                                {confirmable && canEditPaymentMethod(ticket) && (
+                                    <Button
+                                        variant="outline-secondary"
+                                        title="Đổi hình thức thanh toán"
+                                        disabled={busy}
+                                        onClick={() => setEditPaymentTicket(ticket)}
+                                    >
+                                        <BsPencil />
+                                    </Button>
+                                )}
                                 {confirmable && isBankPending(ticket) && ticket.feePayer === 'RECEIVER' && (
                                     <Button
                                         variant="outline-primary"
@@ -454,6 +474,13 @@ export default function CargoQueuePanel({
                 </Button>
             </Modal.Footer>
         </Modal>
+        {editPaymentTicket && (
+            <EditPaymentMethodModal
+                ticket={editPaymentTicket}
+                onClose={() => setEditPaymentTicket(null)}
+                onSuccess={() => { setEditPaymentTicket(null); refetch(); onQueueChanged?.(); }}
+            />
+        )}
     </section>;
 }
 
