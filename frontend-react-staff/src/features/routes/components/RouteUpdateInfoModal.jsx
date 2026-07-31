@@ -105,6 +105,7 @@ export default function RouteUpdateInfoModal({ isOpen, data, onClose, onSuccess 
                             required maxLength={100}
                             className="py-2"
                         />
+                        <small className="text-muted">Định dạng: "Điểm Đầu - Điểm Cuối"</small>
                     </Form.Group>
 
 

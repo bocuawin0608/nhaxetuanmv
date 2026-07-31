@@ -371,7 +371,11 @@ export default function RouteViewDetailModal({ isOpen, data, onClose }) {
                                                         size="sm"
                                                         variant="success"
                                                         className="d-flex align-items-center gap-1 text-white"
-                                                        onClick={handleCalculateDistances}
+                                                        onClick={() => {
+                                                            handleCalculateDistances()
+                                                            setDraftRouteStops(structuredClone(originalRouteStops));
+                                                            setPendingCoachStop(null);
+                                                        }}
                                                         disabled={isClosingRightPanel || calculatingDistances}
                                                     >
                                                         {calculatingDistances ? (
@@ -385,11 +389,12 @@ export default function RouteViewDetailModal({ isOpen, data, onClose }) {
                                                         variant="danger"
                                                         className="fw-medium d-flex align-items-center gap-1"
                                                         onClick={() => {
+                                                            setDraftRouteStops(structuredClone(originalRouteStops));
+                                                            setPendingCoachStop(null);
                                                             setIsClosingRightPanel(true);
                                                             setTimeout(() => {
                                                                 setShowRightPanel(false);
                                                                 setIsClosingRightPanel(false);
-                                                                setDraftRouteStops(structuredClone(originalRouteStops));
                                                             }, 240);
                                                         }}
                                                         disabled={isClosingRightPanel}
@@ -481,7 +486,7 @@ export default function RouteViewDetailModal({ isOpen, data, onClose }) {
                                 </div>
 
                                 <div>
-                                    <h6 className="fw-bold text-dark border-bottom pb-2 mb-3">Các trạm dừng (Route Stops)</h6>
+                                    <h6 className="fw-bold text-dark border-bottom pb-2 mb-3">Các trạm dừng</h6>
                                     {draftRouteStops && draftRouteStops.length > 0 ? (
                                         <div className="table-responsive">
                                             <DraftRouteStopsTable

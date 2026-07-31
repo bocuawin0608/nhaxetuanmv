@@ -88,7 +88,7 @@ export default function RouteCreatePage() {
                 <BsArrowLeft size={18} /> Quay lại danh sách
             </Button>
 
-            <h2 className="mb-4 text-dark fw-bold">Thêm mới tuyến xe (Kéo thả)</h2>
+            <h2 className="mb-4 text-dark fw-bold">Thêm mới tuyến xe</h2>
 
             {errorMsg && (
                 <Alert variant="danger" className="shadow-sm border-0 d-flex align-items-center gap-2">
@@ -112,7 +112,7 @@ export default function RouteCreatePage() {
                                         name="routeName"
                                         required
                                         maxLength={100}
-                                        placeholder="Ví dụ: Hà Nội - Sapa"
+                                        placeholder="Ví dụ: Hà Nội - Quảng Trị"
                                         value={formData.routeName}
                                         onChange={handleInputChange}
                                         className="py-2"
@@ -142,13 +142,13 @@ export default function RouteCreatePage() {
 
                 <Card className="shadow-sm border-0 mb-4">
                     <Card.Header className="bg-white border-bottom pt-3 pb-2">
-                        <h5 className="fw-bold mb-0 text-dark">Kéo thả trạm dừng (Drag & Drop)</h5>
+                        <h5 className="fw-bold mb-0 text-dark">Danh sách trạm dừng</h5>
                         <small className="text-muted">
-                            Kéo từ cột TRÁI sang cột PHẢI để chọn trạm. Kéo LÊN/XUỐNG trong cột phải để sắp xếp thứ tự. Kéo từ PHẢI ra TRÁI để xóa.
+                            Kéo thả để thêm/xóa trạm. Kéo lên/xuống để sắp xếp thứ tự lộ trình.
                         </small>
                     </Card.Header>
                     <Card.Body className="p-4 bg-light">
-                        <RouteStopsDndManager 
+                        <RouteStopsDndManager
                             available={available}
                             setAvailable={setAvailable}
                             selected={selected}

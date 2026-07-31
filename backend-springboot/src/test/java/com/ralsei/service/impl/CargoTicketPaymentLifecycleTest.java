@@ -42,6 +42,7 @@ import com.ralsei.repository.TicketAgencyRepository;
 import com.ralsei.repository.TripRepository;
 import com.ralsei.service.TransactionIdGenerator;
 import com.ralsei.service.cargoticket.CargoTicketPaymentPolicy;
+import com.ralsei.service.cargoticket.impl.CargoTicketPaymentPolicyImpl;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -69,7 +70,7 @@ class CargoTicketPaymentLifecycleTest {
 
     @BeforeEach
     void setUp() {
-        paymentPolicy = new CargoTicketPaymentPolicy(paymentRepository, refundRepository);
+        paymentPolicy = new CargoTicketPaymentPolicyImpl(paymentRepository, refundRepository);
         ReflectionTestUtils.setField(cargoTicketService, "cargoTicketPaymentPolicy", paymentPolicy);
 
         ticketStaff = new Staff();

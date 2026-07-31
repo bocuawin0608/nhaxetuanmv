@@ -25,7 +25,7 @@ import jakarta.validation.constraints.Pattern;
 public class RouteRequest {
     @NotBlank(message = "Route name is required")
     @Size(max = 255, message = "Route name must be less than 255 characters")
-    @Pattern(regexp = "^.+ - .+$", message = "Tên tuyến đường không hợp lệ. Vui lòng nhập theo định dạng: Điểm đi - Điểm đến (VD: Hà Nội - Quảng Trị)")
+    @Pattern(regexp = "^(Hà Nội - Quảng Trị|Quảng Trị - Hà Nội)$", message = "Tên tuyến đường không hợp lệ. Chỉ chấp nhận: Hà Nội - Quảng Trị hoặc Quảng Trị - Hà Nội")
     private String routeName;
 
     @NotNull(message = "Total kilometers is required")

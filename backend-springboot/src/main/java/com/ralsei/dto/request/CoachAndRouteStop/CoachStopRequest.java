@@ -30,7 +30,7 @@ public class CoachStopRequest {
 
     @NotBlank(message = "City is required")
     @Size(max = 255, message = "City must be less than 255 characters")
-    @Pattern(regexp = "^[\\p{L}\\p{N}\\s.-]+$", message = "Thành phố không hợp lệ. Vui lòng nhập theo định dạng: Chỉ chứa chữ cái, số, dấu chấm, gạch ngang và khoảng trắng.")
+    @Pattern(regexp = "^(Hà Nội|Quảng Trị)$", message = "Thành phố không hợp lệ. Chỉ chấp nhận: Hà Nội hoặc Quảng Trị.")
     private String city;
 
 }

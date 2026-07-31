@@ -107,7 +107,7 @@ export default function RouteStopsDndManager({ available, setAvailable, selected
     const [activeId, setActiveId] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSearchQuery, setSelectedSearchQuery] = useState('');
-    
+
     // Debounced search queries
     const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
     const [debouncedSelectedSearchQuery, setDebouncedSelectedSearchQuery] = useState('');
@@ -129,7 +129,7 @@ export default function RouteStopsDndManager({ available, setAvailable, selected
     const filteredAvailable = useMemo(() => {
         if (!debouncedSearchQuery) return available;
         const lowerQuery = debouncedSearchQuery.toLowerCase();
-        return available.filter(stop => 
+        return available.filter(stop =>
             (stop.stopPointName && stop.stopPointName.toLowerCase().includes(lowerQuery)) ||
             (stop.city && stop.city.toLowerCase().includes(lowerQuery)) ||
             (stop.address && stop.address.toLowerCase().includes(lowerQuery))
@@ -139,7 +139,7 @@ export default function RouteStopsDndManager({ available, setAvailable, selected
     const filteredSelected = useMemo(() => {
         if (!debouncedSelectedSearchQuery) return selected;
         const lowerQuery = debouncedSelectedSearchQuery.toLowerCase();
-        return selected.filter(stop => 
+        return selected.filter(stop =>
             (stop.stopPointName && stop.stopPointName.toLowerCase().includes(lowerQuery)) ||
             (stop.city && stop.city.toLowerCase().includes(lowerQuery)) ||
             (stop.address && stop.address.toLowerCase().includes(lowerQuery))
@@ -242,7 +242,7 @@ export default function RouteStopsDndManager({ available, setAvailable, selected
                 <Col md={6}>
                     <DroppableContainer
                         id="available"
-                        title="Danh sách tất cả trạm dừng (Kéo để thêm)"
+                        title="Trạm dừng có sẵn"
                         items={filteredAvailable.map(s => String(s.stopPointId))}
                         badgeCount={filteredAvailable.length}
                         badgeColor="secondary"
@@ -256,7 +256,7 @@ export default function RouteStopsDndManager({ available, setAvailable, selected
                                 <Form.Control
                                     type="text"
                                     size="sm"
-                                    placeholder="Tìm kiếm trạm dừng..."
+                                    placeholder="Tìm kiếm..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     style={{ paddingLeft: '32px' }}
@@ -273,7 +273,7 @@ export default function RouteStopsDndManager({ available, setAvailable, selected
                 <Col md={6}>
                     <DroppableContainer
                         id="selected"
-                        title="Trạm dừng Tuyến chính"
+                        title="Lộ trình tuyến"
                         items={filteredSelected.map(s => String(s.stopPointId))}
                         badgeCount={filteredSelected.length}
                         badgeColor="secondary"
@@ -291,7 +291,7 @@ export default function RouteStopsDndManager({ available, setAvailable, selected
                                 <Form.Control
                                     type="text"
                                     size="sm"
-                                    placeholder="Tìm kiếm trạm dừng đã chọn..."
+                                    placeholder="Tìm kiếm..."
                                     value={selectedSearchQuery}
                                     onChange={(e) => setSelectedSearchQuery(e.target.value)}
                                     style={{ paddingLeft: '32px' }}

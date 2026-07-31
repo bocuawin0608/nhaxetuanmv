@@ -9,9 +9,15 @@ export default function DraftRouteStopsTable({
     isDeleteMode, selectedForDeletion, setSelectedForDeletion 
 }) {
     const toggleSelection = (routeStopId) => {
-        if (!routeStopId) return; // Cannot delete unsaved draft stops this way easily, but we'll assume they only delete existing
-        setSelectedForDeletion(prev => 
-            prev.includes(routeStopId) 
+        if (!routeStopId) return;
+        const alreadySelected = selectedForDeletion.includes(routeStopId);
+        if (!alreadySelected) {
+            // Block selection if deleting this stop would leave fewer than 2
+            const remainingCount = draftRouteStops.length - selectedForDeletion.length - 1;
+            if (remainingCount < 2) return;
+        }
+        setSelectedForDeletion(prev =>
+            alreadySelected
                 ? prev.filter(id => id !== routeStopId)
                 : [...prev, routeStopId]
         );

@@ -53,6 +53,7 @@ import com.ralsei.repository.TicketAgencyRepository;
 import com.ralsei.repository.TripRepository;
 import com.ralsei.service.TransactionIdGenerator;
 import com.ralsei.service.cargoticket.CargoTicketPaymentPolicy;
+import com.ralsei.service.cargoticket.impl.CargoTicketPaymentPolicyImpl;
 
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -82,7 +83,7 @@ class CargoTicketServiceValidationTest {
     @BeforeEach
     void setUp() {
         CargoTicketPaymentPolicy paymentPolicy =
-                new CargoTicketPaymentPolicy(paymentRepository, refundRepository);
+                new CargoTicketPaymentPolicyImpl(paymentRepository, refundRepository);
         ReflectionTestUtils.setField(cargoTicketService, "cargoTicketPaymentPolicy", paymentPolicy);
 
         request = new CargoTicketRequest();
