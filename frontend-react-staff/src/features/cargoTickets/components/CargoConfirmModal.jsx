@@ -28,7 +28,7 @@ export default function CargoConfirmModal({
                     : message}
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={onCancel} disabled={confirming}>
+                <Button className="custom-btn-general" onClick={onCancel} disabled={confirming}>
                     {cancelLabel}
                 </Button>
                 <Button

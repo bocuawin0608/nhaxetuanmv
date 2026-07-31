@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useCargoTicketFormOptions } from '../hooks/useCargoTicketFormOptions';
 import { useAuth } from '../../auth/context/AuthContext';
 import { routeApi } from '../../routes/api/routeApi';
-import { formatCurrency } from '../../../utils/formatters';
+import { formatCurrency, safeRound } from '../../../utils/formatters';
 import PhoneAutocomplete from './PhoneAutocomplete';
 import CargoTicketDetailSection from './CargoTicketDetailSection';
 import '../styles/CargoTicketForm.css';
@@ -694,7 +694,7 @@ function buildCargoTicketRequest(form, draftDetails) {
             quantity: Number(d.quantity),
             weightKg: Number(d.weightKg),
             // Stabilize volume so paid trip-only updates do not look like price edits.
-            dimensionVol: Number(Number(d.dimensionVol).toFixed(6))
+            dimensionVol: safeRound(Number(d.dimensionVol), 6)
         }))
     };
 }

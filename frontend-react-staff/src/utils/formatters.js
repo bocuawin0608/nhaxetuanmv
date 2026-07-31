@@ -31,6 +31,16 @@ export const formatDateTime = (dateInput) => {
     return `${d}/${m}/${y} ${h}:${min}`;
 };
 
+/**
+ * Reliable rounding that avoids floating-point edge cases.
+ * Shifts the decimal to the right, rounds the integer, then shifts it back.
+ * @param {number} number  - The value to round.
+ * @param {number} decimals - Number of decimal places.
+ * @returns {number} The rounded number (not a string).
+ */
+export const safeRound = (number, decimals) =>
+    Number(Math.round(number + 'e' + decimals) + 'e-' + decimals);
+
 export {
     COACH_VALIDATION,
     validateAndFormatLicensePlate,

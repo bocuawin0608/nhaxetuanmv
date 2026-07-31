@@ -3,6 +3,7 @@ import { useCargoTypes } from '../../cargo/hooks/useCargoTypes';
 import { useEffect, useState } from 'react';
 import { BsTrash, BsPlus } from 'react-icons/bs';
 import { cargoTicketApi } from '../api/cargoTicketApi';
+import { safeRound } from '../../../utils/formatters';
 
 function Field({ label, required, suffix, ...props }) {
     return (
@@ -45,7 +46,8 @@ function DetailItem({
         onChange(index, field, value);
         const dimensions = { length: detail.length, width: detail.width, height: detail.height, [field]: value };
         if ([dimensions.length, dimensions.width, dimensions.height].every(item => Number(item) > 0)) {
-            onChange(index, 'dimensionVol', Number(dimensions.length) * Number(dimensions.width) * Number(dimensions.height));
+            const rawVol = Number(dimensions.length) * Number(dimensions.width) * Number(dimensions.height);
+            onChange(index, 'dimensionVol', safeRound(rawVol, 6));
         }
     };
 

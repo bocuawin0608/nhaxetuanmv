@@ -118,7 +118,7 @@ export default function EditPaymentMethodModal({ ticket, onClose, onSuccess }) {
                     Đóng
                 </Button>
                 <Button
-                    variant="primary"
+                    className="custom-btn-general"
                     disabled={busy || !hasChanged}
                     onClick={handleSave}
                 >
