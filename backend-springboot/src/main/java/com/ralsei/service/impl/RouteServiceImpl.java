@@ -118,7 +118,7 @@ public class RouteServiceImpl implements RouteService {
         // Call Goong API to calculate distances
         goongService.calculateAndSetRouteStopsDistances(sortedStops);
 
-        // Assign total distance to Route
+        // Assign total distance and total time to Route
         route.setTotalKilometers(sortedStops.get(sortedStops.size() - 1).getKilometersFromStart());
         route.setTotalMinutes(sortedStops.get(sortedStops.size() - 1).getMinutesFromStart());
 
@@ -133,7 +133,7 @@ public class RouteServiceImpl implements RouteService {
     /**
      * Updates the route.
      *
-     * @param id the value supplied for this operation
+     * @param id      the value supplied for this operation
      * @param request the value supplied for this operation
      *
      * @return the updated route
@@ -170,10 +170,10 @@ public class RouteServiceImpl implements RouteService {
     /**
      * Returns the all routes.
      *
-     * @param search the value supplied for this operation
+     * @param search   the value supplied for this operation
      * @param isActive the value supplied for this operation
-     * @param page the value supplied for this operation
-     * @param size the value supplied for this operation
+     * @param page     the value supplied for this operation
+     * @param size     the value supplied for this operation
      *
      * @return the all routes
      */
@@ -226,7 +226,8 @@ public class RouteServiceImpl implements RouteService {
             boolean anyInactive = route.getRouteStops().stream()
                     .anyMatch(rs -> rs.getCoachStop() != null && !rs.getCoachStop().isActive());
             if (anyInactive) {
-                throw new IllegalArgumentException("Không thể kích hoạt tuyến đường này vì có điểm dừng chưa được kích hoạt.");
+                throw new IllegalArgumentException(
+                        "Không thể kích hoạt tuyến đường này vì có điểm dừng chưa được kích hoạt.");
             }
         }
 

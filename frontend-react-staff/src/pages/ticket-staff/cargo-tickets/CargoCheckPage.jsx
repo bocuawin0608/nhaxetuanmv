@@ -71,7 +71,7 @@ export default function CargoCheckPage() {
             <header className="cargo-page-heading compact">
                 <p className="cargo-eyebrow">Kiểm tra hàng</p>
                 <h1>{selectedTrip.licensePlate || 'Chưa gán biển số'}</h1>
-                <p>Chỉ hiển thị các đơn cần nhận thuộc xe đã chọn.</p>
+                <p>Chỉ hiển thị các đơn cần giao hàng thuộc xe đã chọn.</p>
             </header>
             <CargoQueuePanel
                 status="ARRIVED"
@@ -86,13 +86,13 @@ export default function CargoCheckPage() {
         return <main className="cargo-operations-page">
             <div className="cargo-toolbar">
                 <Button variant="link" className="cargo-back" onClick={() => setShowHistory(false)}>
-                    <BsArrowLeft /> Xe đang chờ nhận hàng
+                    <BsArrowLeft /> Xe đang chờ giao hàng
                 </Button>
             </div>
             <header className="cargo-page-heading compact">
                 <p className="cargo-eyebrow">Kiểm tra hàng</p>
-                <h1>Lịch sử nhận hàng</h1>
-                <p>Các đơn đã được nhân viên văn phòng đích xác nhận nhận hàng.</p>
+                <h1>Lịch sử giao hàng</h1>
+                <p>Các đơn đã được nhân viên văn phòng đích xác nhận giao hàng.</p>
             </header>
             <CargoQueuePanel status="DELIVERED" />
         </main>;
@@ -104,13 +104,13 @@ export default function CargoCheckPage() {
                 <BsArrowLeft /> Đơn hàng
             </Button>
             <Button className="cargo-primary-button" onClick={() => setShowHistory(true)}>
-                Xem lịch sử nhận hàng
+                Xem lịch sử giao hàng
             </Button>
         </div>
         <header className="cargo-page-heading compact">
             <p className="cargo-eyebrow">Kiểm tra hàng</p>
             <h1>Xe đã dỡ hàng</h1>
-            <p>Chọn một xe để xem riêng các đơn đang chờ văn phòng xác nhận nhận hàng.</p>
+            <p>Chọn một xe để xem riêng các đơn đang chờ văn phòng xác nhận giao hàng.</p>
             {agency && <div className="cargo-context-row">
                 <div className="cargo-agency-context">
                     <BsGeoAltFill />
@@ -126,7 +126,7 @@ export default function CargoCheckPage() {
         {error && <Alert variant="danger">{error}</Alert>}
         {loading ? <div className="cargo-loading"><Spinner size="sm" /> Đang tải xe đã dỡ hàng...</div> : (
             <section className="cargo-trip-grid">
-                {trips.length === 0 && <div className="cargo-empty">Không có xe nào còn đơn hàng chờ nhận tại văn phòng này.</div>}
+                {trips.length === 0 && <div className="cargo-empty">Không có xe nào còn đơn hàng chờ giao tại văn phòng này.</div>}
                 {trips.map(trip => (
                     <ReceivingTripCard
                         key={trip.tripId}
@@ -148,7 +148,7 @@ function ReceivingTripCard({ trip, onSelect }) {
         <article className="cargo-trip-card">
             <div className="cargo-trip-top">
                 <h2>{trip.routeName || 'Chưa có tuyến'}</h2>
-                <Badge bg="warning" text="dark">{trip.waitingOrderCount || 0} đơn chờ nhận</Badge>
+                <Badge bg="warning" text="dark">{trip.waitingOrderCount || 0} đơn chờ giao hàng</Badge>
             </div>
             <div className="cargo-coach-line">
                 <BsBusFront />

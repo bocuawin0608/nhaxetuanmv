@@ -55,6 +55,7 @@ public class GoongServiceImpl implements GoongService {
      *
      * @return the distance and time
      */
+    @Deprecated
     public DistanceTimeResponse getDistanceAndTime(DistanceTimeRequest request) {
         String origin = request.getOriginLat() + ", " + request.getOriginLng();
         String destination = request.getDestinationLat() + ", " + request.getDestinationLng();

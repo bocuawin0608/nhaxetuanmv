@@ -15,8 +15,8 @@ import EditPaymentMethodModal from './EditPaymentMethodModal';
 
 const QUEUE_STATUS_PRESENTATION = {
     RECEIVED: { label: 'Đang chờ', badge: 'primary' },
-    ARRIVED: { label: 'Chờ nhận hàng', badge: 'warning' },
-    DELIVERED: { label: 'Đã nhận hàng', badge: 'success' }
+    ARRIVED: { label: 'Chờ giao hàng', badge: 'warning' },
+    DELIVERED: { label: 'Đã giao hàng', badge: 'success' }
 };
 
 const PAYMENT_STATUS_LABEL = {
@@ -170,7 +170,7 @@ export default function CargoQueuePanel({
             ticket,
             title: 'Xác nhận giao hàng',
             message: `Xác nhận ${ticket.receiverName} đã nhận đơn ${ticket.ticketCode}?`,
-            confirmLabel: 'Đã nhận hàng',
+            confirmLabel: 'Đã giao hàng',
             confirmVariant: 'success',
         });
     };
@@ -406,7 +406,7 @@ export default function CargoQueuePanel({
                                         disabled={busy || !canConfirmDeliver(ticket)}
                                         onClick={() => requestDeliver(ticket)}
                                     >
-                                        {needsReceiverPaymentChoice(ticket) ? 'Thu tiền / giao hàng' : 'Đã nhận hàng'}
+                                        {needsReceiverPaymentChoice(ticket) ? 'Thu tiền / giao hàng' : 'Đã giao hàng'}
                                     </Button>
                                 )}
                             </div>
