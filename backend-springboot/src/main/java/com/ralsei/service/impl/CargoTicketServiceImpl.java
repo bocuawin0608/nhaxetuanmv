@@ -135,7 +135,8 @@ public class CargoTicketServiceImpl implements CargoTicketService {
                 .findUpcomingCargoOperationalTrips(accountId, PageRequest.of(page, size))
                 .map(trip -> {
                     BigDecimal used = trip.getUsedCargoVolume() == null
-                            ? BigDecimal.ZERO : trip.getUsedCargoVolume();
+                            ? BigDecimal.ZERO
+                            : trip.getUsedCargoVolume();
                     return CargoOperationalTripResponse.builder()
                             .tripId(trip.getTripId())
                             .routeId(trip.getRouteId())
@@ -179,8 +180,8 @@ public class CargoTicketServiceImpl implements CargoTicketService {
      * authenticated ticket staff member's destination office.
      *
      * @param accountId authenticated ticket-staff account
-     * @param page zero-based page number
-     * @param size requested page size
+     * @param page      zero-based page number
+     * @param size      requested page size
      * @return office context and a page of receiving coaches
      */
     public CargoReceivingTripPageResponse getReceivingTrips(
@@ -226,7 +227,7 @@ public class CargoTicketServiceImpl implements CargoTicketService {
     /**
      * Returns the form options.
      *
-     * @param pickupStopId the value supplied for this operation
+     * @param pickupStopId  the value supplied for this operation
      * @param dropoffStopId the value supplied for this operation
      *
      * @return the form options
@@ -410,7 +411,7 @@ public class CargoTicketServiceImpl implements CargoTicketService {
     /**
      * Updates the cargo ticket.
      *
-     * @param id the value supplied for this operation
+     * @param id      the value supplied for this operation
      * @param request the value supplied for this operation
      *
      * @return the updated cargo ticket
@@ -419,7 +420,8 @@ public class CargoTicketServiceImpl implements CargoTicketService {
         CargoTicket ticket = findByIdOrThrow(id);
         requirePending(ticket, "Chỉ đơn đang chờ mới được cập nhật.");
         Payment payment = cargoTicketPaymentPolicy.findPayment(ticket);
-        // Header update does not recompute freight; amount is guarded only when details change.
+        // Header update does not recompute freight; amount is guarded only when details
+        // change.
         guardPaidOrderFeeFields(ticket, payment, request);
 
         BigDecimal existingTotal = ticket.getTotalPrice();
@@ -489,7 +491,8 @@ public class CargoTicketServiceImpl implements CargoTicketService {
 
         guardPaidOrderFeeFields(ticket, existingPayment, request);
         // Paid orders may still change trip/contacts. Only reject when freight inputs
-        // would change the collected amount (AF-2). Avoid false rejects from recalc drift.
+        // would change the collected amount (AF-2). Avoid false rejects from recalc
+        // drift.
         if (freightInputsChanged) {
             guardPaidOrderAmount(existingPayment, requestedTotal);
         }
@@ -545,7 +548,7 @@ public class CargoTicketServiceImpl implements CargoTicketService {
      * Creates the cargo ticket detail.
      *
      * @param ticketId the value supplied for this operation
-     * @param request the value supplied for this operation
+     * @param request  the value supplied for this operation
      *
      * @return the created cargo ticket detail
      */
@@ -597,7 +600,7 @@ public class CargoTicketServiceImpl implements CargoTicketService {
      * Updates the cargo ticket detail.
      *
      * @param detailId the value supplied for this operation
-     * @param request the value supplied for this operation
+     * @param request  the value supplied for this operation
      *
      * @return the updated cargo ticket detail
      */
@@ -683,7 +686,7 @@ public class CargoTicketServiceImpl implements CargoTicketService {
     /**
      * Completes the destination ticket-office hand-off after trip staff unload.
      *
-     * @param id cargo ticket identifier
+     * @param id        cargo ticket identifier
      * @param accountId authenticated destination ticket-staff account
      */
     public void confirmReceived(int id, Integer accountId, ConfirmReceivedRequest request) {
@@ -980,7 +983,10 @@ public class CargoTicketServiceImpl implements CargoTicketService {
         guardPaidOrderAmount(payment, nextTotal);
     }
 
-    /** AF-2: paid orders cannot change fee payer or payment method. COD is independent of freight. */
+    /**
+     * AF-2: paid orders cannot change fee payer or payment method. COD is
+     * independent of freight.
+     */
     private void guardPaidOrderFeeFields(
             CargoTicket ticket, Payment payment, CargoTicketRequest request) {
         if (!cargoTicketPaymentPolicy.isCompleted(payment)) {
@@ -1055,6 +1061,10 @@ public class CargoTicketServiceImpl implements CargoTicketService {
         if (request.getPickupStopId() == request.getDropoffStopId()) {
             throw new BusinessRuleException("Điểm nhận và điểm trả hàng phải khác nhau.");
         }
+        if (request.getSenderPhone() != null && request.getReceiverPhone() != null
+                && request.getSenderPhone().trim().equals(request.getReceiverPhone().trim())) {
+            throw new BusinessRuleException("Số điện thoại người gửi và người nhận không được trùng nhau.");
+        }
         if (request.getTripId() != null && !tripRepository.existsById(request.getTripId())) {
             throw new ResourceNotFoundException("Không tìm thấy chuyến đi có ID là: " + request.getTripId());
         }
@@ -1111,7 +1121,8 @@ public class CargoTicketServiceImpl implements CargoTicketService {
         var trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chuyến đi có ID là: " + tripId));
         if (!"SCHEDULED".equals(trip.getStatus())) {
-            throw new BusinessRuleException("Chuyến xe đã khởi hành hoặc không còn hoạt động, không thể nhận thêm hàng.");
+            throw new BusinessRuleException(
+                    "Chuyến xe đã khởi hành hoặc không còn hoạt động, không thể nhận thêm hàng.");
         }
     }
 
@@ -1121,7 +1132,7 @@ public class CargoTicketServiceImpl implements CargoTicketService {
      * COD and order-level description are taken from the form (COD defaults to 0
      * when omitted).
      *
-     * @param request cargo order being created
+     * @param request      cargo order being created
      * @param currentStaff authenticated ticket-office staff member
      */
     private void applyCreateBusinessDefaults(CargoTicketRequest request, Staff currentStaff) {
@@ -1202,7 +1213,9 @@ public class CargoTicketServiceImpl implements CargoTicketService {
         }
     }
 
-    /** Calculates the physical volume occupied by all packages in one detail row. */
+    /**
+     * Calculates the physical volume occupied by all packages in one detail row.
+     */
     private BigDecimal occupiedVolume(CargoTicketDetail detail) {
         return CargoVolumePolicy.occupiedVolume(detail.getDimensionVol(), detail.getQuantity());
     }

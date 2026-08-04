@@ -56,6 +56,7 @@ public class RouteServiceImpl implements RouteService {
      *
      * @return the created route
      */
+    @Deprecated
     public RouteResponse createRoute(RouteRequest request) {
         Route route = Route.builder()
                 .routeName(request.getRouteName())

@@ -57,7 +57,8 @@ public class RouteController {
      *
      * @return the created route with stops
      */
-    public ResponseEntity<RouteWithStopsResponse> createRouteWithStops(@Valid @RequestBody RouteWithStopsRequest request) {
+    public ResponseEntity<RouteWithStopsResponse> createRouteWithStops(
+            @Valid @RequestBody RouteWithStopsRequest request) {
         RouteWithStopsResponse response = routeService.createRouteWithStops(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

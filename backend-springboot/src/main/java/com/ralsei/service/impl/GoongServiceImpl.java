@@ -172,7 +172,6 @@ public class GoongServiceImpl implements GoongService {
         }
     }
 
-    @Override
     /**
      * Executes the geocode operation.
      *
@@ -180,6 +179,7 @@ public class GoongServiceImpl implements GoongService {
      *
      * @return the operation result
      */
+    @Override
     public GeocodeResponse geocode(String address) {
         String url = "https://rsapi.goong.io/v2/geocode?api_key=" + goongApiKey + "&address=" + address;
         JsonNode response = restTemplate.getForObject(url, JsonNode.class);
@@ -197,4 +197,5 @@ public class GoongServiceImpl implements GoongService {
                 .formattedAddress(firstResult.path("formatted_address").asText())
                 .build();
     }
+
 }
